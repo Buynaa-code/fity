@@ -7,7 +7,5 @@ class AuthService {
     return false;
   }
 
-  Future<void> logout() async {
-    
-  }
+  Future<void> logout() async {}
 }
