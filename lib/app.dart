@@ -5,6 +5,7 @@ import 'features/onboarding/onboarding_screen.dart';
 import 'features/home/screens/home_screen.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/register_screen.dart';
+import 'features/profile/screens/profile_screen.dart';
 import 'features/home/bloc/bloc.dart';
 import 'features/workout/bloc/bloc.dart';
 import 'features/qr_entry/bloc/bloc.dart';
@@ -42,6 +43,7 @@ class FityApp extends StatelessWidget {
           '/login': (context) => const LoginScreen(),
           '/register': (context) => const RegisterScreen(),
           '/home': (context) => const HomeScreen(),
+          '/profile': (context) => const ProfileScreen(),
         },
       ),
     );

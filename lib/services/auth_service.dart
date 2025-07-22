@@ -88,11 +88,59 @@ class AuthService {
 
   static Future<bool> signOut() async {
     try {
+      // Sign out from Google Sign-In
       await _googleSignIn.signOut();
+      
+      // Also disconnect to ensure complete sign out
+      await _googleSignIn.disconnect();
+      
+      print('Successfully signed out from all services');
       return true;
+    } on MissingPluginException catch (e) {
+      // Handle case where plugin is not configured
+      print('Google Sign-In plugin not configured, but considering logout successful: ${e.message}');
+      return true; // Return true for development purposes
     } catch (e) {
       print('Sign out error: $e');
       return false;
+    }
+  }
+
+  // Check if user is currently signed in
+  static Future<bool> isSignedIn() async {
+    try {
+      return await _googleSignIn.isSignedIn();
+    } catch (e) {
+      print('Check sign in status error: $e');
+      return false;
+    }
+  }
+
+  // Get current user information
+  static Future<Map<String, dynamic>?> getCurrentUserInfo() async {
+    try {
+      final GoogleSignInAccount? currentUser = await _googleSignIn.signInSilently();
+      
+      if (currentUser != null) {
+        final GoogleSignInAuthentication auth = await currentUser.authentication;
+        
+        return {
+          'user': {
+            'id': currentUser.id,
+            'name': currentUser.displayName,
+            'email': currentUser.email,
+            'photoUrl': currentUser.photoUrl,
+          },
+          'tokens': {
+            'idToken': auth.idToken,
+            'accessToken': auth.accessToken,
+          }
+        };
+      }
+      return null;
+    } catch (e) {
+      print('Get current user error: $e');
+      return null;
     }
   }
 
