@@ -6,12 +6,8 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Нэвтрэх'),
-      ),
-      body: const Center(
-        child: Text('Нэвтрэх хуудас'),
-      ),
+      appBar: AppBar(title: const Text('Нэвтрэх')),
+      body: const Center(child: Text('Нэвтрэх хуудас')),
     );
   }
 }
