@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/daily_progress_widget.dart';
 import '../../qr_entry/screens/qr_scanner_screen.dart';
 import '../../workout/screens/workout_list_screen.dart';
 import '../../health/screens/calorie_screen.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../../services/auth_service.dart';
 
@@ -19,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   static const primaryColor = Color(0xFFFE7409);
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
 
   Future<void> _signInWithGoogle() async {
     setState(() {
@@ -50,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
           // Navigate to home screen after a delay
           await Future.delayed(const Duration(seconds: 1));
+          // ignore: use_build_context_synchronously
           Navigator.pushReplacementNamed(context, '/home');
         }
       } else {
