@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../../services/auth_service.dart';
+import '../../../data/datasources/auth/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,7 +18,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   static const primaryColor = Color(0xFFFE7409);
 
-
   Future<void> _signInWithGoogle() async {
     setState(() {
       _isLoading = true;
@@ -26,22 +25,24 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final result = await AuthService.signInWithGoogle();
-      
+
       if (result != null && result['success'] == true) {
         final user = result['user'];
         final isMock = result['mock'] ?? false;
-        
+
         print('Google Sign-In амжилттай');
         print('User: ${user['name']}');
         print('Email: ${user['email']}');
         print('Mock: $isMock');
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(isMock 
-                ? 'Туршилтын режимд нэвтэрлээ: ${user['name']}'
-                : 'Амжилттай нэвтэрлээ: ${user['name']}'),
+              content: Text(
+                isMock
+                    ? 'Туршилтын режимд нэвтэрлээ: ${user['name']}'
+                    : 'Амжилттай нэвтэрлээ: ${user['name']}',
+              ),
               backgroundColor: isMock ? Colors.orange : Colors.green,
             ),
           );
@@ -54,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         final error = result?['error'] ?? 'Тодорхойгүй алдаа';
         print('Google Sign-In алдаа: $error');
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -242,9 +243,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? null
                           : () {
                             if (_formKey.currentState!.validate()) {
-                              // TODO: Implement login logic
-                              print('Email: ${_emailController.text}');
-                              print('Password: ${_passwordController.text}');
+                              Navigator.pushReplacementNamed(context, '/home');
                             }
                           },
                   style: ElevatedButton.styleFrom(

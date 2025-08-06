@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'features/splash/splash_screen.dart';
-import 'features/onboarding/onboarding_screen.dart';
-import 'features/home/screens/home_screen.dart';
-import 'features/auth/screens/login_screen.dart';
-import 'features/auth/screens/register_screen.dart';
-import 'features/profile/screens/profile_screen.dart';
-import 'features/home/bloc/bloc.dart';
-import 'features/workout/bloc/bloc.dart';
-import 'features/qr_entry/bloc/bloc.dart';
+import 'presentation/pages/splash/splash_screen.dart';
+import 'presentation/pages/onboarding/onboarding_screen.dart';
+import 'presentation/pages/home/home_screen.dart';
+import 'presentation/pages/auth/login_screen.dart';
+import 'presentation/pages/auth/register_screen.dart';
+import 'presentation/pages/profile/profile_screen.dart';
+import 'presentation/bloc/home/bloc.dart';
+import 'presentation/bloc/workout/bloc.dart';
+import 'presentation/bloc/qr_entry/bloc.dart';
 
 class FityApp extends StatelessWidget {
   const FityApp({super.key});
