@@ -38,11 +38,15 @@ PODS:
   - GTMSessionFetcher/Core (3.5.0)
   - GTMSessionFetcher/Full (3.5.0):
     - GTMSessionFetcher/Core
+  - mobile_scanner (7.0.0):
+    - Flutter
+    - FlutterMacOS
   - PromisesObjC (2.4.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - google_sign_in_ios (from `.symlinks/plugins/google_sign_in_ios/darwin`)
+  - mobile_scanner (from `.symlinks/plugins/mobile_scanner/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -59,6 +63,8 @@ EXTERNAL SOURCES:
     :path: Flutter
   google_sign_in_ios:
     :path: ".symlinks/plugins/google_sign_in_ios/darwin"
+  mobile_scanner:
+    :path: ".symlinks/plugins/mobile_scanner/darwin"
 
 SPEC CHECKSUMS:
   AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
@@ -69,6 +75,7 @@ SPEC CHECKSUMS:
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
+  mobile_scanner: 77265f3dc8d580810e91849d4a0811a90467ed5e
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
 
 PODFILE CHECKSUM: 4305caec6b40dde0ae97be1573c53de1882a07e5

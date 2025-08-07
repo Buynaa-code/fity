@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'dart:math';
-import 'package:http/http.dart' as http;
-
 import '../qr_scanner/qr_scanner_screen.dart';
 import '../workout/workout_list_screen.dart';
 import '../health/calorie_screen.dart';
@@ -509,6 +506,14 @@ class _HomeContentState extends State<_HomeContent>
     );
   }
 
+  void _showTimerDialog() {
+    HapticFeedback.lightImpact();
+    showDialog(
+      context: context,
+      builder: (context) => _TimerDialog(isDarkMode: widget.isDarkMode),
+    );
+  }
+
   void _startWorkout() {
     Navigator.push(
       context,
@@ -584,6 +589,8 @@ class _HomeContentState extends State<_HomeContent>
                   _buildDailyProgressCards(),
                   const SizedBox(height: 24),
                   _buildQuickActionsSection(),
+                  const SizedBox(height: 24),
+                  _buildWorkoutScheduleSection(),
                   const SizedBox(height: 24),
                   _buildGymOccupancyCard(),
                   const SizedBox(height: 16),
@@ -1206,121 +1213,156 @@ class _HomeContentState extends State<_HomeContent>
     String target = '',
     Color progressColor = Colors.blue,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: widget.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: (widget.isDarkMode ? Colors.black : Colors.grey).withOpacity(
-              0.1,
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.selectionClick();
+        _showProgressCardDetails(
+          title,
+          value,
+          subtitle,
+          showProgress,
+          progress,
+          iconColor,
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: widget.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: (widget.isDarkMode ? Colors.black : Colors.grey)
+                  .withOpacity(0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
             ),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
-        border:
-            widget.isDarkMode
-                ? Border.all(color: Colors.grey[800]!, width: 0.5)
-                : null,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: iconColor, size: 24),
-              ),
-              const Spacer(),
-              if (showProgress)
+          ],
+          border:
+              widget.isDarkMode
+                  ? Border.all(color: Colors.grey[800]!, width: 0.5)
+                  : null,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
                 Container(
-                  width: 50,
-                  height: 50,
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(
-                          value: progress,
-                          strokeWidth: 4,
-                          backgroundColor:
-                              widget.isDarkMode
-                                  ? Colors.grey[800]
-                                  : Colors.grey[200],
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            progressColor,
-                          ),
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: Center(
-                          child: Text(
-                            '${(progress * 100).toInt()}%',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w700,
-                              color: progressColor,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: iconColor.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: iconColor, size: 24),
+                ),
+                const Spacer(),
+                if (showProgress)
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Stack(
+                      children: [
+                        SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CircularProgressIndicator(
+                            value: progress,
+                            strokeWidth: 4,
+                            backgroundColor:
+                                widget.isDarkMode
+                                    ? Colors.grey[800]
+                                    : Colors.grey[200],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              progressColor,
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: TextStyle(
-              color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: widget.isDarkMode ? Colors.white : Colors.black87,
-                ),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color:
-                          widget.isDarkMode
-                              ? Colors.grey[400]
-                              : Colors.grey[700],
-                      fontWeight: FontWeight.w600,
+                        Positioned.fill(
+                          child: Center(
+                            child: Text(
+                              '${(progress * 100).toInt()}%',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                color: progressColor,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: TextStyle(
+                color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isDarkMode ? Colors.white : Colors.black87,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ],
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color:
+                            widget.isDarkMode
+                                ? Colors.grey[400]
+                                : Colors.grey[700],
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  void _showProgressCardDetails(
+    String title,
+    String value,
+    String subtitle,
+    bool showProgress,
+    double progress,
+    Color iconColor,
+  ) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => _ProgressCardDialog(
+            title: title,
+            value: value,
+            subtitle: subtitle,
+            showProgress: showProgress,
+            progress: progress,
+            iconColor: iconColor,
+            isDarkMode: widget.isDarkMode,
+          ),
     );
   }
 
@@ -1501,7 +1543,7 @@ class _HomeContentState extends State<_HomeContent>
                         ),
 
                         // Circular progress indicator
-                        Container(
+                        SizedBox(
                           width: 90,
                           height: 90,
                           child: Stack(
@@ -1655,10 +1697,7 @@ class _HomeContentState extends State<_HomeContent>
                 iconColor: const Color(0xFF16A085),
                 title: 'Таймер',
                 subtitle: 'Хугацаа хэмжих',
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  // TODO: Start timer
-                },
+                onTap: _showTimerDialog,
               ),
             ),
           ],
@@ -1704,6 +1743,380 @@ class _HomeContentState extends State<_HomeContent>
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildWorkoutScheduleSection() {
+    final today = DateTime.now();
+    final weekDays = ['Да', 'Мя', 'Лх', 'Пү', 'Ба', 'Бя', 'Ня'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Expanded(child: _buildSectionTitle('Дасгалын хуваарь 📅')),
+            GestureDetector(
+              onTap: _showWorkoutScheduleSettings,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFE7409).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: const Color(0xFFFE7409).withOpacity(0.3),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.settings_rounded,
+                      color: const Color(0xFFFE7409),
+                      size: 16,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Тохиргоо',
+                      style: TextStyle(
+                        color: const Color(0xFFFE7409),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: widget.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: (widget.isDarkMode ? Colors.black : Colors.grey)
+                    .withOpacity(0.1),
+                blurRadius: 15,
+                offset: const Offset(0, 5),
+              ),
+            ],
+            border:
+                widget.isDarkMode
+                    ? Border.all(color: Colors.grey[800]!, width: 0.5)
+                    : null,
+          ),
+          child: Column(
+            children: [
+              // Week days header
+              Row(
+                children:
+                    weekDays.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final day = entry.value;
+                      final isToday = index == (today.weekday - 1);
+
+                      return Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          decoration:
+                              isToday
+                                  ? BoxDecoration(
+                                    color: const Color(
+                                      0xFFFE7409,
+                                    ).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  )
+                                  : null,
+                          child: Text(
+                            day,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontWeight:
+                                  isToday ? FontWeight.bold : FontWeight.w500,
+                              color:
+                                  isToday
+                                      ? const Color(0xFFFE7409)
+                                      : (widget.isDarkMode
+                                          ? Colors.grey[400]
+                                          : Colors.grey[600]),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+              ),
+              const SizedBox(height: 16),
+              // Workout schedule for the week
+              Row(
+                children: List.generate(7, (index) {
+                  final hasWorkout = _getWorkoutForDay(index);
+                  final workoutProgram = _getWorkoutProgramForDay(index);
+                  final isToday = index == (today.weekday - 1);
+
+                  // Get program details if there's a workout
+                  final programIcon =
+                      workoutProgram.isNotEmpty
+                          ? _getWorkoutProgramIcon(workoutProgram)
+                          : (hasWorkout
+                              ? Icons.fitness_center_rounded
+                              : Icons.hotel_rounded);
+                  final programColor =
+                      workoutProgram.isNotEmpty
+                          ? _getWorkoutProgramColor(workoutProgram)
+                          : const Color(0xFFFE7409);
+
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => _toggleWorkoutDay(index),
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color:
+                              hasWorkout
+                                  ? programColor
+                                  : (widget.isDarkMode
+                                      ? Colors.grey[800]
+                                      : Colors.grey[200]),
+                          borderRadius: BorderRadius.circular(12),
+                          border:
+                              isToday
+                                  ? Border.all(
+                                    color:
+                                        hasWorkout
+                                            ? Colors.white
+                                            : const Color(0xFFFE7409),
+                                    width: 2,
+                                  )
+                                  : null,
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                programIcon,
+                                color:
+                                    hasWorkout
+                                        ? Colors.white
+                                        : (widget.isDarkMode
+                                            ? Colors.grey[400]
+                                            : Colors.grey[500]),
+                                size: 18,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                hasWorkout
+                                    ? (workoutProgram.isNotEmpty
+                                        ? workoutProgram
+                                        : 'Дасгал')
+                                    : 'Амралт',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color:
+                                      hasWorkout
+                                          ? Colors.white
+                                          : (widget.isDarkMode
+                                              ? Colors.grey[400]
+                                              : Colors.grey[500]),
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                }),
+              ),
+              const SizedBox(height: 16),
+              // Weekly summary with today's program
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildScheduleStat(
+                    'Долоо хоногт',
+                    '4 өдөр',
+                    Icons.calendar_today_rounded,
+                  ),
+                  _buildScheduleStat(
+                    'Дараагийн',
+                    _getNextWorkoutInfo(),
+                    Icons.schedule_rounded,
+                  ),
+                  _buildTodayWorkoutStat(),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildScheduleStat(String label, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, color: const Color(0xFFFE7409), size: 18),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: widget.isDarkMode ? Colors.grey[500] : Colors.grey[600],
+            fontSize: 11,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: widget.isDarkMode ? Colors.white : Colors.black87,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  bool _getWorkoutForDay(int dayIndex) {
+    // Mock data - in a real app, this would come from user preferences
+    final scheduledDays = [1, 2, 4, 6]; // Monday, Tuesday, Friday, Sunday
+    return scheduledDays.contains(dayIndex);
+  }
+
+  String _getWorkoutProgramForDay(int dayIndex) {
+    // Mock data - in a real app, this would come from user preferences
+    final workoutPrograms = {
+      0: '', // Monday - Rest
+      1: 'Цээж', // Tuesday - Chest
+      2: '', // Wednesday - Rest
+      3: 'Гар', // Thursday - Arms
+      4: '', // Friday - Rest
+      5: 'Хөл', // Saturday - Legs
+      6: 'Нуруу', // Sunday - Back
+    };
+    return workoutPrograms[dayIndex] ?? '';
+  }
+
+  IconData _getWorkoutProgramIcon(String program) {
+    final programIcons = {
+      'Цээж': Icons.fitness_center_rounded,
+      'Нуруу': Icons.accessibility_new_rounded,
+      'Гар': Icons.sports_gymnastics_rounded,
+      'Хөл': Icons.directions_run_rounded,
+      'Мөр': Icons.sports_martial_arts_rounded,
+      'Хэвлий': Icons.self_improvement_rounded,
+      'Кардио': Icons.favorite_rounded,
+      'Бүх бие': Icons.person_rounded,
+    };
+    return programIcons[program] ?? Icons.fitness_center_rounded;
+  }
+
+  Color _getWorkoutProgramColor(String program) {
+    final programColors = {
+      'Цээж': const Color(0xFF6C5CE7),
+      'Нуруу': const Color(0xFF16A085),
+      'Гар': const Color(0xFFF39C12),
+      'Хөл': const Color(0xFFE74C3C),
+      'Мөр': const Color(0xFF9B59B6),
+      'Хэвлий': const Color(0xFF2ECC71),
+      'Кардио': const Color(0xFFE91E63),
+      'Бүх бие': const Color(0xFF34495E),
+    };
+    return programColors[program] ?? const Color(0xFFFE7409);
+  }
+
+  String _getNextWorkoutInfo() {
+    final today = DateTime.now().weekday - 1; // Convert to 0-6 format
+
+    // Find next workout day
+    for (int i = 1; i <= 7; i++) {
+      final dayIndex = (today + i) % 7;
+      if (_getWorkoutForDay(dayIndex)) {
+        final program = _getWorkoutProgramForDay(dayIndex);
+        final dayNames = [
+          'Даваа',
+          'Мягмар',
+          'Лхагва',
+          'Пүрэв',
+          'Баасан',
+          'Бямба',
+          'Ням',
+        ];
+        final dayName = i == 1 ? 'Маргааш' : dayNames[dayIndex];
+        return program.isNotEmpty ? '$dayName ($program)' : dayName;
+      }
+    }
+    return 'Байхгүй';
+  }
+
+  Widget _buildTodayWorkoutStat() {
+    final today = DateTime.now().weekday - 1; // Convert to 0-6 format
+    final hasWorkout = _getWorkoutForDay(today);
+    final program = _getWorkoutProgramForDay(today);
+
+    return Column(
+      children: [
+        Icon(
+          hasWorkout ? _getWorkoutProgramIcon(program) : Icons.hotel_rounded,
+          color:
+              hasWorkout
+                  ? _getWorkoutProgramColor(program)
+                  : const Color(0xFFFE7409),
+          size: 18,
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Өнөөдөр',
+          style: TextStyle(
+            color: widget.isDarkMode ? Colors.grey[500] : Colors.grey[600],
+            fontSize: 11,
+          ),
+        ),
+        Text(
+          hasWorkout
+              ? (program.isNotEmpty ? program : 'Дасгал ✅')
+              : 'Амралт 😴',
+          style: TextStyle(
+            color: widget.isDarkMode ? Colors.white : Colors.black87,
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _toggleWorkoutDay(int dayIndex) {
+    HapticFeedback.selectionClick();
+    // TODO: Toggle workout day in user preferences
+    setState(() {
+      // This would update the user's workout schedule
+    });
+  }
+
+  void _showWorkoutScheduleSettings() {
+    HapticFeedback.lightImpact();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder:
+          (context) =>
+              _WorkoutScheduleSettingsSheet(isDarkMode: widget.isDarkMode),
     );
   }
 
@@ -1931,5 +2344,1151 @@ class _HomeContentState extends State<_HomeContent>
         ],
       ),
     );
+  }
+}
+
+// Custom Timer Dialog
+class _TimerDialog extends StatefulWidget {
+  final bool isDarkMode;
+
+  const _TimerDialog({required this.isDarkMode});
+
+  @override
+  State<_TimerDialog> createState() => __TimerDialogState();
+}
+
+class __TimerDialogState extends State<_TimerDialog>
+    with TickerProviderStateMixin {
+  int _selectedMinutes = 5;
+  int _selectedSeconds = 0;
+  bool _isRunning = false;
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  void _startTimer() {
+    setState(() {
+      _isRunning = true;
+    });
+    _pulseController.repeat(reverse: true);
+    HapticFeedback.mediumImpact();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor:
+          widget.isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.timer_rounded,
+                  color: const Color(0xFF16A085),
+                  size: 28,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Workout Timer',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: widget.isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildTimeSelector('мин', _selectedMinutes, (value) {
+                  setState(() => _selectedMinutes = value);
+                }),
+                const SizedBox(width: 20),
+                Text(
+                  ':',
+                  style: TextStyle(
+                    fontSize: 24,
+                    color: widget.isDarkMode ? Colors.white : Colors.black87,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                _buildTimeSelector('сек', _selectedSeconds, (value) {
+                  setState(() => _selectedSeconds = value);
+                }),
+              ],
+            ),
+            const SizedBox(height: 30),
+            Row(
+              children: [
+                Expanded(
+                  child: TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Цуцлах',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: AnimatedBuilder(
+                    animation: _pulseAnimation,
+                    builder: (context, child) {
+                      return Transform.scale(
+                        scale: _isRunning ? _pulseAnimation.value : 1.0,
+                        child: ElevatedButton(
+                          onPressed: _isRunning ? null : _startTimer,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF16A085),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            _isRunning ? 'Ажиллаж байна...' : 'Эхлэх',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimeSelector(String label, int value, Function(int) onChanged) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: widget.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: 80,
+          height: 100,
+          child: ListWheelScrollView.useDelegate(
+            itemExtent: 40,
+            physics: const FixedExtentScrollPhysics(),
+            onSelectedItemChanged: onChanged,
+            childDelegate: ListWheelChildBuilderDelegate(
+              builder: (context, index) {
+                final isSelected = index == value;
+                return Center(
+                  child: Text(
+                    index.toString().padLeft(2, '0'),
+                    style: TextStyle(
+                      fontSize: isSelected ? 24 : 18,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      color:
+                          isSelected
+                              ? const Color(0xFF16A085)
+                              : (widget.isDarkMode
+                                  ? Colors.grey[400]
+                                  : Colors.grey[600]),
+                    ),
+                  ),
+                );
+              },
+              childCount: label == 'мин' ? 60 : 60,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Progress Card Details Dialog
+class _ProgressCardDialog extends StatelessWidget {
+  final String title;
+  final String value;
+  final String subtitle;
+  final bool showProgress;
+  final double progress;
+  final Color iconColor;
+  final bool isDarkMode;
+
+  const _ProgressCardDialog({
+    required this.title,
+    required this.value,
+    required this.subtitle,
+    required this.showProgress,
+    required this.progress,
+    required this.iconColor,
+    required this.isDarkMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      backgroundColor: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Icon(_getIconForTitle(title), color: iconColor, size: 32),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              '$value $subtitle',
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                color: iconColor,
+              ),
+            ),
+            if (showProgress) ...[
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: Stack(
+                  children: [
+                    SizedBox(
+                      width: 120,
+                      height: 120,
+                      child: CircularProgressIndicator(
+                        value: progress,
+                        strokeWidth: 8,
+                        backgroundColor:
+                            isDarkMode ? Colors.grey[800] : Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(iconColor),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Center(
+                        child: Text(
+                          '${(progress * 100).toInt()}%',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w800,
+                            color: iconColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: iconColor,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'OK',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IconData _getIconForTitle(String title) {
+    switch (title) {
+      case 'Алхам':
+        return Icons.directions_walk_rounded;
+      case 'Калори':
+        return Icons.local_fire_department_rounded;
+      case 'Жин':
+        return Icons.fitness_center_rounded;
+      case 'Зүрхний цохилт':
+        return Icons.favorite_rounded;
+      default:
+        return Icons.info_rounded;
+    }
+  }
+}
+
+// Workout Stats Bottom Sheet
+class _WorkoutStatsSheet extends StatelessWidget {
+  final bool isDarkMode;
+
+  const _WorkoutStatsSheet({required this.isDarkMode});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Өнөөдрийн статистик',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 20),
+            _buildStatRow('🔥', 'Шатаасан калори', '1,247 kcal', Colors.red),
+            const SizedBox(height: 16),
+            _buildStatRow('👣', 'Алхсан алхам', '8,247 алхам', Colors.blue),
+            const SizedBox(height: 16),
+            _buildStatRow('⏱️', 'Дасгалын хугацаа', '45 минут', Colors.green),
+            const SizedBox(height: 16),
+            _buildStatRow('💪', 'Хийсэн дасгал', '3 дасгал', Colors.purple),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFE7409),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Дэлгэрэнгүй үзэх',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatRow(String emoji, String title, String value, Color color) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(emoji, style: const TextStyle(fontSize: 20)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  fontSize: 14,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  color: isDarkMode ? Colors.white : Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Workout Program Data Model
+class WorkoutProgram {
+  final String name;
+  final String description;
+  final IconData icon;
+  final Color color;
+
+  WorkoutProgram(this.name, this.description, this.icon, this.color);
+}
+
+// Workout Schedule Settings Bottom Sheet
+class _WorkoutScheduleSettingsSheet extends StatefulWidget {
+  final bool isDarkMode;
+
+  const _WorkoutScheduleSettingsSheet({required this.isDarkMode});
+
+  @override
+  State<_WorkoutScheduleSettingsSheet> createState() =>
+      _WorkoutScheduleSettingsSheetState();
+}
+
+class _WorkoutScheduleSettingsSheetState
+    extends State<_WorkoutScheduleSettingsSheet> {
+  final Map<int, bool> _workoutDays = {
+    0: false, // Monday
+    1: true, // Tuesday
+    2: false, // Wednesday
+    3: true, // Thursday
+    4: false, // Friday
+    5: true, // Saturday
+    6: true, // Sunday
+  };
+
+  // Workout programs assigned to each day
+  final Map<int, String> _workoutPrograms = {
+    0: '', // Monday
+    1: 'Цээж', // Tuesday - Chest
+    2: '', // Wednesday
+    3: 'Гар', // Thursday - Arms
+    4: '', // Friday
+    5: 'Хөл', // Saturday - Legs
+    6: 'Нуруу', // Sunday - Back
+  };
+
+  TimeOfDay _workoutTime = const TimeOfDay(hour: 18, minute: 0);
+  int _workoutDuration = 60; // minutes
+  String _workoutIntensity = 'Medium';
+
+  final List<String> _weekDays = [
+    'Даваа',
+    'Мягмар',
+    'Лхагва',
+    'Пүрэв',
+    'Баасан',
+    'Бямба',
+    'Ням',
+  ];
+  final List<String> _intensityLevels = [
+    'Бага',
+    'Дунд',
+    'Хүчтэй',
+    'Маш хүчтэй',
+  ];
+  final List<int> _durationOptions = [30, 45, 60, 75, 90, 120];
+
+  // Available workout programs
+  final List<WorkoutProgram> _availablePrograms = [
+    WorkoutProgram('', 'Амралтын өдөр', Icons.hotel_rounded, Colors.grey),
+    WorkoutProgram(
+      'Цээж',
+      'Цээжний булчин',
+      Icons.fitness_center_rounded,
+      const Color(0xFF6C5CE7),
+    ),
+    WorkoutProgram(
+      'Нуруу',
+      'Нурууны булчин',
+      Icons.accessibility_new_rounded,
+      const Color(0xFF16A085),
+    ),
+    WorkoutProgram(
+      'Гар',
+      'Гарын булчин',
+      Icons.sports_gymnastics_rounded,
+      const Color(0xFFF39C12),
+    ),
+    WorkoutProgram(
+      'Хөл',
+      'Хөлний булчин',
+      Icons.directions_run_rounded,
+      const Color(0xFFE74C3C),
+    ),
+    WorkoutProgram(
+      'Мөр',
+      'Мөрний булчин',
+      Icons.sports_martial_arts_rounded,
+      const Color(0xFF9B59B6),
+    ),
+    WorkoutProgram(
+      'Хэвлий',
+      'Хэвлийн булчин',
+      Icons.self_improvement_rounded,
+      const Color(0xFF2ECC71),
+    ),
+    WorkoutProgram(
+      'Кардио',
+      'Зүрхний дасгал',
+      Icons.favorite_rounded,
+      const Color(0xFFE91E63),
+    ),
+    WorkoutProgram(
+      'Бүх бие',
+      'Бүх биеийн дасгал',
+      Icons.person_rounded,
+      const Color(0xFF34495E),
+    ),
+  ];
+
+  WorkoutProgram _getSelectedProgram(String programName) {
+    return _availablePrograms.firstWhere(
+      (program) => program.name == programName,
+      orElse: () => _availablePrograms.first,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.9,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder:
+          (context, scrollController) => Container(
+            decoration: BoxDecoration(
+              color: widget.isDarkMode ? const Color(0xFF2A2A2A) : Colors.white,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Handle
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[400],
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Header
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.schedule_rounded,
+                        color: const Color(0xFFFE7409),
+                        size: 28,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Дасгалын хуваарь тохируулах',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color:
+                              widget.isDarkMode ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Days and workout program selection
+                          _buildSectionTitle('Долоо хоногийн хуваарь'),
+                          const SizedBox(height: 16),
+                          Column(
+                            children:
+                                _weekDays.asMap().entries.map((entry) {
+                                  final index = entry.key;
+                                  final day = entry.value;
+                                  final hasWorkout =
+                                      _workoutDays[index] ?? false;
+                                  final workoutProgram =
+                                      _workoutPrograms[index] ?? '';
+
+                                  return Container(
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    padding: const EdgeInsets.all(20),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          widget.isDarkMode
+                                              ? const Color(0xFF1E1E1E)
+                                              : Colors.grey[50],
+                                      borderRadius: BorderRadius.circular(16),
+                                      border:
+                                          widget.isDarkMode
+                                              ? Border.all(
+                                                color: Colors.grey[800]!,
+                                                width: 0.5,
+                                              )
+                                              : null,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        // Day header with switch
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              day,
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                                color:
+                                                    widget.isDarkMode
+                                                        ? Colors.white
+                                                        : Colors.black87,
+                                              ),
+                                            ),
+                                            Switch(
+                                              value: hasWorkout,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  _workoutDays[index] = value;
+                                                  if (!value) {
+                                                    _workoutPrograms[index] =
+                                                        '';
+                                                  }
+                                                });
+                                                HapticFeedback.selectionClick();
+                                              },
+                                              activeColor: const Color(
+                                                0xFFFE7409,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        // Workout program selection (show only if workout enabled)
+                                        if (hasWorkout) ...[
+                                          const SizedBox(height: 16),
+                                          Text(
+                                            'Дасгалын төрөл:',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color:
+                                                  widget.isDarkMode
+                                                      ? Colors.grey[400]
+                                                      : Colors.grey[600],
+                                            ),
+                                          ),
+                                          const SizedBox(height: 12),
+                                          Wrap(
+                                            spacing: 8,
+                                            runSpacing: 8,
+                                            children:
+                                                _availablePrograms.map((
+                                                  program,
+                                                ) {
+                                                  final isSelected =
+                                                      workoutProgram ==
+                                                      program.name;
+                                                  return GestureDetector(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        _workoutPrograms[index] =
+                                                            program.name;
+                                                      });
+                                                      HapticFeedback.selectionClick();
+                                                    },
+                                                    child: Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 12,
+                                                            vertical: 8,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color:
+                                                            isSelected
+                                                                ? program.color
+                                                                : (widget
+                                                                        .isDarkMode
+                                                                    ? Colors
+                                                                        .grey[800]
+                                                                    : Colors
+                                                                        .grey[200]),
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              20,
+                                                            ),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          Icon(
+                                                            program.icon,
+                                                            size: 16,
+                                                            color:
+                                                                isSelected
+                                                                    ? Colors
+                                                                        .white
+                                                                    : program
+                                                                        .color,
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 6,
+                                                          ),
+                                                          Text(
+                                                            program.name.isEmpty
+                                                                ? 'Амралт'
+                                                                : program.name,
+                                                            style: TextStyle(
+                                                              fontSize: 12,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w600,
+                                                              color:
+                                                                  isSelected
+                                                                      ? Colors
+                                                                          .white
+                                                                      : (widget
+                                                                              .isDarkMode
+                                                                          ? Colors
+                                                                              .grey[400]
+                                                                          : Colors
+                                                                              .grey[700]),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  );
+                                                }).toList(),
+                                          ),
+
+                                          // Show selected program details
+                                          if (workoutProgram.isNotEmpty) ...[
+                                            const SizedBox(height: 12),
+                                            Container(
+                                              padding: const EdgeInsets.all(12),
+                                              decoration: BoxDecoration(
+                                                color: _getSelectedProgram(
+                                                  workoutProgram,
+                                                ).color.withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
+                                                  color: _getSelectedProgram(
+                                                    workoutProgram,
+                                                  ).color.withOpacity(0.3),
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    _getSelectedProgram(
+                                                      workoutProgram,
+                                                    ).icon,
+                                                    color:
+                                                        _getSelectedProgram(
+                                                          workoutProgram,
+                                                        ).color,
+                                                    size: 20,
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    _getSelectedProgram(
+                                                      workoutProgram,
+                                                    ).description,
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      color:
+                                                          _getSelectedProgram(
+                                                            workoutProgram,
+                                                          ).color,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Time selection
+                          _buildSectionTitle('Цаг тохируулах'),
+                          const SizedBox(height: 16),
+                          GestureDetector(
+                            onTap: _selectTime,
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color:
+                                    widget.isDarkMode
+                                        ? const Color(0xFF1E1E1E)
+                                        : Colors.grey[50],
+                                borderRadius: BorderRadius.circular(16),
+                                border:
+                                    widget.isDarkMode
+                                        ? Border.all(
+                                          color: Colors.grey[800]!,
+                                          width: 0.5,
+                                        )
+                                        : null,
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      color: const Color(
+                                        0xFFFE7409,
+                                      ).withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: const Icon(
+                                      Icons.access_time_rounded,
+                                      color: Color(0xFFFE7409),
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Дасгалын цаг',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color:
+                                                widget.isDarkMode
+                                                    ? Colors.grey[400]
+                                                    : Colors.grey[600],
+                                          ),
+                                        ),
+                                        Text(
+                                          _workoutTime.format(context),
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color:
+                                                widget.isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black87,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.chevron_right_rounded,
+                                    color: Colors.grey,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Duration selection
+                          _buildSectionTitle('Үргэлжлэх хугацаа'),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color:
+                                  widget.isDarkMode
+                                      ? const Color(0xFF1E1E1E)
+                                      : Colors.grey[50],
+                              borderRadius: BorderRadius.circular(16),
+                              border:
+                                  widget.isDarkMode
+                                      ? Border.all(
+                                        color: Colors.grey[800]!,
+                                        width: 0.5,
+                                      )
+                                      : null,
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '$_workoutDuration минут',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFFFE7409),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 12,
+                                  children:
+                                      _durationOptions.map((duration) {
+                                        final isSelected =
+                                            duration == _workoutDuration;
+                                        return GestureDetector(
+                                          onTap: () {
+                                            setState(() {
+                                              _workoutDuration = duration;
+                                            });
+                                            HapticFeedback.selectionClick();
+                                          },
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 8,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  isSelected
+                                                      ? const Color(0xFFFE7409)
+                                                      : (widget.isDarkMode
+                                                          ? Colors.grey[800]
+                                                          : Colors.grey[200]),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: Text(
+                                              '$durationмин',
+                                              style: TextStyle(
+                                                color:
+                                                    isSelected
+                                                        ? Colors.white
+                                                        : (widget.isDarkMode
+                                                            ? Colors.grey[400]
+                                                            : Colors.grey[600]),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Intensity selection
+                          _buildSectionTitle('Эрч хүчний түвшин'),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: BoxDecoration(
+                              color:
+                                  widget.isDarkMode
+                                      ? const Color(0xFF1E1E1E)
+                                      : Colors.grey[50],
+                              borderRadius: BorderRadius.circular(16),
+                              border:
+                                  widget.isDarkMode
+                                      ? Border.all(
+                                        color: Colors.grey[800]!,
+                                        width: 0.5,
+                                      )
+                                      : null,
+                            ),
+                            child: Column(
+                              children:
+                                  _intensityLevels.map((intensity) {
+                                    final isSelected =
+                                        intensity == _workoutIntensity;
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 4,
+                                      ),
+                                      child: RadioListTile<String>(
+                                        title: Text(
+                                          intensity,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color:
+                                                widget.isDarkMode
+                                                    ? Colors.white
+                                                    : Colors.black87,
+                                          ),
+                                        ),
+                                        value: intensity,
+                                        groupValue: _workoutIntensity,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _workoutIntensity = value!;
+                                          });
+                                          HapticFeedback.selectionClick();
+                                        },
+                                        activeColor: const Color(0xFFFE7409),
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                    );
+                                  }).toList(),
+                            ),
+                          ),
+                          const SizedBox(height: 32),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Save button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _saveSchedule,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFE7409),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: const Text(
+                        'Хадгалах',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: widget.isDarkMode ? Colors.white : Colors.black87,
+      ),
+    );
+  }
+
+  void _selectTime() async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: _workoutTime,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            primaryColor: const Color(0xFFFE7409),
+            colorScheme: const ColorScheme.light(primary: Color(0xFFFE7409)),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null && picked != _workoutTime) {
+      setState(() {
+        _workoutTime = picked;
+      });
+      HapticFeedback.selectionClick();
+    }
+  }
+
+  void _saveSchedule() {
+    HapticFeedback.mediumImpact();
+
+    // Show success feedback
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text(
+          '✅ Дасгалын хуваарь амжилттай хадгалагдлаа!',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
+        backgroundColor: const Color(0xFFFE7409),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+
+    Navigator.pop(context);
   }
 }
