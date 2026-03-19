@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../qr_scanner/qr_scanner_screen.dart';
 import '../workout/workout_list_screen.dart';
 import '../health/calorie_screen.dart';
 import '../challenges/challenges_screen.dart';
 import '../profile/profile_screen.dart';
+import '../../../features/water_tracker/presentation/pages/water_tracker_screen.dart';
+import '../../../features/water_tracker/presentation/bloc/water_bloc.dart';
+import '../../../features/water_tracker/presentation/bloc/water_state.dart';
+import '../../../features/statistics/presentation/pages/statistics_screen.dart';
+import '../../../features/statistics/presentation/bloc/statistics_bloc.dart';
+import '../../../features/statistics/presentation/bloc/statistics_state.dart';
+import '../../../features/trainer_marketplace/presentation/pages/trainer_list_screen.dart';
 
 // Simple theme notifier for dark mode
 class ThemeNotifier extends ChangeNotifier {
@@ -1142,63 +1150,113 @@ class _HomeContentState extends State<_HomeContent>
   }
 
   Widget _buildDailyProgressCards() {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: _buildProgressCard(
-                icon: Icons.directions_walk_rounded,
-                iconColor: const Color(0xFF6C5CE7),
-                title: 'Алхам',
-                value: '8,247',
-                subtitle: '/ 10,000 алхам',
-                target: '10,000',
-                progress: 0.82,
-                progressColor: const Color(0xFF6C5CE7),
-                showProgress: true,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildProgressCard(
-                icon: Icons.local_fire_department_rounded,
-                iconColor: const Color(0xFFF39C12),
-                title: 'Калори',
-                value: '1,247',
-                subtitle: '/ 1,500 kcal',
-                showProgress: false,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            Expanded(
-              child: _buildProgressCard(
-                icon: Icons.fitness_center_rounded,
-                iconColor: const Color(0xFF16A085),
-                title: 'Жин',
-                value: '68.5',
-                subtitle: 'kg',
-                showProgress: false,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: _buildProgressCard(
-                icon: Icons.favorite_rounded,
-                iconColor: const Color(0xFFE74C3C),
-                title: 'Зүрхний цохилт',
-                value: '84',
-                subtitle: 'bpm',
-                showProgress: false,
-              ),
-            ),
-          ],
-        ),
-      ],
+    return BlocBuilder<WaterBloc, WaterState>(
+      builder: (context, waterState) {
+        return BlocBuilder<StatisticsBloc, StatisticsState>(
+          builder: (context, statsState) {
+            final waterSummary = waterState.dailySummary;
+            final waterProgress = waterSummary?.progress ?? 0.0;
+            final waterMl = waterSummary?.totalMl ?? 0;
+            final waterGoal = waterSummary?.goalMl ?? 2000;
+
+            final stats = statsState.workoutStats;
+            final totalWorkouts = stats?.totalWorkouts ?? 0;
+            final streak = stats?.currentStreak ?? 0;
+
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const WaterTrackerScreen(),
+                            ),
+                          );
+                        },
+                        child: _buildProgressCard(
+                          icon: Icons.water_drop_rounded,
+                          iconColor: const Color(0xFF3498DB),
+                          title: 'Ус',
+                          value: '${waterMl}',
+                          subtitle: '/ ${waterGoal}мл',
+                          target: '$waterGoal',
+                          progress: waterProgress,
+                          progressColor: const Color(0xFF3498DB),
+                          showProgress: true,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const StatisticsScreen(),
+                            ),
+                          );
+                        },
+                        child: _buildProgressCard(
+                          icon: Icons.local_fire_department_rounded,
+                          iconColor: const Color(0xFFF39C12),
+                          title: 'Streak',
+                          value: '$streak',
+                          subtitle: 'хоног дараалан',
+                          showProgress: false,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const StatisticsScreen(),
+                            ),
+                          );
+                        },
+                        child: _buildProgressCard(
+                          icon: Icons.fitness_center_rounded,
+                          iconColor: const Color(0xFF16A085),
+                          title: 'Дасгал',
+                          value: '$totalWorkouts',
+                          subtitle: 'нийт хийсэн',
+                          showProgress: false,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildProgressCard(
+                        icon: Icons.favorite_rounded,
+                        iconColor: const Color(0xFFE74C3C),
+                        title: 'Зүрхний цохилт',
+                        value: '84',
+                        subtitle: 'bpm',
+                        showProgress: false,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1693,11 +1751,19 @@ class _HomeContentState extends State<_HomeContent>
             const SizedBox(width: 16),
             Expanded(
               child: _buildQuickActionCard(
-                icon: Icons.timer_rounded,
-                iconColor: const Color(0xFF16A085),
-                title: 'Таймер',
-                subtitle: 'Хугацаа хэмжих',
-                onTap: _showTimerDialog,
+                icon: Icons.water_drop_rounded,
+                iconColor: const Color(0xFF3498DB),
+                title: 'Ус уух',
+                subtitle: 'Хэмжээ бүртгэх',
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const WaterTrackerScreen(),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -1707,16 +1773,16 @@ class _HomeContentState extends State<_HomeContent>
           children: [
             Expanded(
               child: _buildQuickActionCard(
-                icon: Icons.restaurant_rounded,
+                icon: Icons.bar_chart_rounded,
                 iconColor: const Color(0xFFF39C12),
-                title: 'Хооллох',
-                subtitle: 'Калори тооцоо',
+                title: 'Статистик',
+                subtitle: 'Ахиц дэвшил',
                 onTap: () {
                   HapticFeedback.lightImpact();
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const CalorieScreen(),
+                      builder: (context) => const StatisticsScreen(),
                     ),
                   );
                 },
@@ -1737,6 +1803,41 @@ class _HomeContentState extends State<_HomeContent>
                       builder: (context) => const ChallengesScreen(),
                     ),
                   );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildQuickActionCard(
+                icon: Icons.sports_gymnastics_rounded,
+                iconColor: const Color(0xFF00B894),
+                title: 'Дасгалжуулагч',
+                subtitle: 'Захиалга өгөх',
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TrainerListScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: _buildQuickActionCard(
+                icon: Icons.shopping_bag_rounded,
+                iconColor: const Color(0xFFFE7409),
+                title: 'Дэлгүүр',
+                subtitle: 'Тэжээлийн нэмэлт',
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  Navigator.pushNamed(context, '/shop');
                 },
               ),
             ),

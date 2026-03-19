@@ -5,14 +5,19 @@ import 'presentation/pages/home/home_screen.dart';
 import 'presentation/pages/auth/login_screen.dart';
 import 'presentation/pages/auth/register_screen.dart';
 import 'presentation/pages/profile/profile_screen.dart';
+import 'features/water_tracker/presentation/pages/water_tracker_screen.dart';
+import 'features/statistics/presentation/pages/statistics_screen.dart';
+import 'features/supplement_shop/presentation/screens/product_list_screen.dart';
+import 'features/supplement_shop/presentation/screens/order_history_screen.dart';
 
-class FityApp extends StatelessWidget {
-  const FityApp({super.key});
+class FityMaterialApp extends StatelessWidget {
+  const FityMaterialApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'FitZone',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.orange,
         primaryColor: const Color(0xFFFE7409),
@@ -29,6 +34,10 @@ class FityApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/home': (context) => const HomeScreen(),
         '/profile': (context) => const ProfileScreen(),
+        '/water-tracker': (context) => const WaterTrackerScreen(),
+        '/statistics': (context) => const StatisticsScreen(),
+        '/shop': (context) => const ProductListScreen(),
+        '/order-history': (context) => const OrderHistoryScreen(),
       },
     );
   }

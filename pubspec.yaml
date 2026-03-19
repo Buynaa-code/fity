@@ -49,6 +49,16 @@ dependencies:
   
   # Data persistence
   shared_preferences: ^2.3.3
+
+  # State management
+  flutter_bloc: ^8.1.6
+  equatable: ^2.0.5
+
+  # Charts
+  fl_chart: ^0.69.2
+
+  # Dependency injection
+  get_it: ^8.0.2
  
 
 dev_dependencies:
