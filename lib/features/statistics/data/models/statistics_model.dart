@@ -3,17 +3,21 @@ import '../../domain/entities/statistics.dart';
 class WorkoutStatisticsModel extends WorkoutStatistics {
   const WorkoutStatisticsModel({
     required super.totalWorkouts,
+    super.todayWorkouts,
     required super.currentStreak,
     required super.bestStreak,
     required super.totalCalories,
     required super.totalTime,
     required super.exerciseCounts,
     super.lastWorkoutDate,
+    super.weeklyWorkouts,
+    super.weeklyCalories,
   });
 
   factory WorkoutStatisticsModel.fromJson(Map<String, dynamic> json) {
     return WorkoutStatisticsModel(
       totalWorkouts: json['totalWorkouts'] as int? ?? 0,
+      todayWorkouts: json['todayWorkouts'] as int? ?? 0,
       currentStreak: json['currentStreak'] as int? ?? 0,
       bestStreak: json['bestStreak'] as int? ?? 0,
       totalCalories: (json['totalCalories'] as num?)?.toDouble() ?? 0,
@@ -22,18 +26,29 @@ class WorkoutStatisticsModel extends WorkoutStatistics {
       lastWorkoutDate: json['lastWorkoutDate'] != null
           ? DateTime.parse(json['lastWorkoutDate'])
           : null,
+      weeklyWorkouts: (json['weeklyWorkouts'] as List<dynamic>?)
+              ?.map((e) => e as int)
+              .toList() ??
+          const [0, 0, 0, 0, 0, 0, 0],
+      weeklyCalories: (json['weeklyCalories'] as List<dynamic>?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          const [0, 0, 0, 0, 0, 0, 0],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'totalWorkouts': totalWorkouts,
+      'todayWorkouts': todayWorkouts,
       'currentStreak': currentStreak,
       'bestStreak': bestStreak,
       'totalCalories': totalCalories,
       'totalTimeMinutes': totalTime.inMinutes,
       'exerciseCounts': exerciseCounts,
       'lastWorkoutDate': lastWorkoutDate?.toIso8601String(),
+      'weeklyWorkouts': weeklyWorkouts,
+      'weeklyCalories': weeklyCalories,
     };
   }
 }

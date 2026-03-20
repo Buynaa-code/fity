@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../domain/entities/water_intake.dart';
 
 abstract class WaterEvent extends Equatable {
   const WaterEvent();
@@ -45,4 +46,26 @@ class UpdateDailyGoal extends WaterEvent {
 
   @override
   List<Object?> get props => [goalMl];
+}
+
+class ResetDailyWater extends WaterEvent {
+  final DateTime? date;
+
+  const ResetDailyWater({this.date});
+
+  @override
+  List<Object?> get props => [date];
+}
+
+class UndoResetDailyWater extends WaterEvent {
+  final List<WaterIntake> previousIntakes;
+  final int previousTotalMl;
+
+  const UndoResetDailyWater({
+    required this.previousIntakes,
+    required this.previousTotalMl,
+  });
+
+  @override
+  List<Object?> get props => [previousIntakes, previousTotalMl];
 }

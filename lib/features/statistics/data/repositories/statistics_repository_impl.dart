@@ -80,14 +80,41 @@ class StatisticsRepositoryImpl implements StatisticsRepository {
       bestStreak = newStreak;
     }
 
+    // Get weekly data
+    final weekStart = todayDate.subtract(Duration(days: todayDate.weekday - 1));
+    final weekActivities = await localDatasource.getDailyActivities(
+      weekStart,
+      todayDate,
+    );
+
+    // Build weekly arrays (Mon-Sun)
+    final weeklyWorkouts = List<int>.filled(7, 0);
+    final weeklyCalories = List<double>.filled(7, 0);
+
+    for (final activity in weekActivities) {
+      final dayIndex = activity.date.weekday - 1; // 0-6 (Mon-Sun)
+      if (dayIndex >= 0 && dayIndex < 7) {
+        weeklyWorkouts[dayIndex] = activity.workoutCount;
+        weeklyCalories[dayIndex] = activity.caloriesBurned;
+      }
+    }
+
+    // Add current workout to today's count
+    final todayIndex = todayDate.weekday - 1;
+    weeklyWorkouts[todayIndex] = (weeklyWorkouts[todayIndex]) + 1;
+    weeklyCalories[todayIndex] = weeklyCalories[todayIndex] + calories;
+
     final updatedStats = WorkoutStatisticsModel(
       totalWorkouts: stats.totalWorkouts + 1,
+      todayWorkouts: weeklyWorkouts[todayIndex],
       currentStreak: newStreak,
       bestStreak: bestStreak,
       totalCalories: stats.totalCalories + calories,
       totalTime: stats.totalTime + duration,
       exerciseCounts: newExerciseCounts,
       lastWorkoutDate: today,
+      weeklyWorkouts: weeklyWorkouts,
+      weeklyCalories: weeklyCalories,
     );
 
     await localDatasource.saveWorkoutStatistics(updatedStats);

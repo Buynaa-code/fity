@@ -48,6 +48,11 @@
 	<!-- Camera permission for QR scanner -->
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs camera access to scan QR codes for gym entry.</string>
+	<!-- HealthKit permissions -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>Fity needs access to your health data to track steps and calories.</string>
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Fity needs permission to save workout data.</string>
 	<!-- Google Sign-In Configuration -->
 	<key>CFBundleURLTypes</key>
 	<array>

@@ -69,4 +69,29 @@ class WaterRepositoryImpl implements WaterRepository {
   Future<int> getDailyGoal() async {
     return await localDatasource.getDailyGoal();
   }
+
+  @override
+  Future<void> resetDailyWater(DateTime date) async {
+    final summary = await localDatasource.getDailySummary(date);
+    final resetSummary = DailyWaterSummaryModel(
+      date: DateTime(date.year, date.month, date.day),
+      totalMl: 0,
+      goalMl: summary.goalMl,
+      intakes: const [],
+    );
+    await localDatasource.saveDailySummary(resetSummary);
+  }
+
+  @override
+  Future<void> restoreIntakes(DateTime date, List<WaterIntake> intakes) async {
+    final summary = await localDatasource.getDailySummary(date);
+    final totalMl = intakes.fold<int>(0, (sum, intake) => sum + intake.amountMl);
+    final restoredSummary = DailyWaterSummaryModel(
+      date: DateTime(date.year, date.month, date.day),
+      totalMl: totalMl,
+      goalMl: summary.goalMl,
+      intakes: intakes,
+    );
+    await localDatasource.saveDailySummary(restoredSummary);
+  }
 }

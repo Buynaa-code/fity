@@ -1182,8 +1182,8 @@ class _HomeContentState extends State<_HomeContent>
                           icon: Icons.water_drop_rounded,
                           iconColor: const Color(0xFF3498DB),
                           title: 'Ус',
-                          value: '${waterMl}',
-                          subtitle: '/ ${waterGoal}мл',
+                          value: '$waterMl',
+                          subtitle: '/ $waterGoalмл',
                           target: '$waterGoal',
                           progress: waterProgress,
                           progressColor: const Color(0xFF3498DB),
@@ -3129,7 +3129,7 @@ class _WorkoutScheduleSettingsSheetState
                                                 });
                                                 HapticFeedback.selectionClick();
                                               },
-                                              activeColor: const Color(
+                                              activeThumbColor: const Color(
                                                 0xFFFE7409,
                                               ),
                                             ),

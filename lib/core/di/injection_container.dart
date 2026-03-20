@@ -13,6 +13,20 @@ import '../../features/statistics/data/repositories/statistics_repository_impl.d
 import '../../features/statistics/domain/repositories/statistics_repository.dart';
 import '../../features/statistics/presentation/bloc/statistics_bloc.dart';
 
+// Gamification (Badges)
+import '../../features/gamification/data/datasources/badge_local_datasource.dart';
+import '../../features/gamification/data/repositories/badge_repository_impl.dart';
+import '../../features/gamification/domain/repositories/badge_repository.dart';
+import '../../features/gamification/presentation/bloc/badge_bloc.dart';
+
+// Health
+import '../services/health_service.dart';
+import '../../features/health/presentation/bloc/health_bloc.dart';
+
+// User
+import '../services/user_preferences_service.dart';
+import '../../features/user/presentation/bloc/user_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -50,5 +64,46 @@ Future<void> init() async {
   // BLoC
   sl.registerFactory(
     () => StatisticsBloc(repository: sl()),
+  );
+
+  // === Gamification (Badges) Feature ===
+  // Data sources
+  sl.registerLazySingleton<BadgeLocalDatasource>(
+    () => BadgeLocalDatasource(sl()),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<BadgeRepository>(
+    () => BadgeRepositoryImpl(sl()),
+  );
+
+  // BLoC
+  sl.registerFactory(
+    () => BadgeBloc(repository: sl()),
+  );
+
+  // === Health Feature ===
+  // Services
+  sl.registerLazySingleton<HealthService>(
+    () => HealthService(),
+  );
+
+  // BLoC
+  sl.registerFactory(
+    () => HealthBloc(
+      healthService: sl(),
+      preferencesService: sl(),
+    ),
+  );
+
+  // === User Feature ===
+  // Services
+  sl.registerLazySingleton<UserPreferencesService>(
+    () => UserPreferencesService(prefs: sl()),
+  );
+
+  // BLoC
+  sl.registerFactory(
+    () => UserBloc(prefs: sl()),
   );
 }

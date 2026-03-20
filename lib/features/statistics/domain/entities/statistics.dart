@@ -2,43 +2,55 @@ import 'package:equatable/equatable.dart';
 
 class WorkoutStatistics extends Equatable {
   final int totalWorkouts;
+  final int todayWorkouts;
   final int currentStreak;
   final int bestStreak;
   final double totalCalories;
   final Duration totalTime;
   final Map<String, int> exerciseCounts;
   final DateTime? lastWorkoutDate;
+  final List<int> weeklyWorkouts;
+  final List<double> weeklyCalories;
 
   const WorkoutStatistics({
     required this.totalWorkouts,
+    this.todayWorkouts = 0,
     required this.currentStreak,
     required this.bestStreak,
     required this.totalCalories,
     required this.totalTime,
     required this.exerciseCounts,
     this.lastWorkoutDate,
+    this.weeklyWorkouts = const [0, 0, 0, 0, 0, 0, 0],
+    this.weeklyCalories = const [0, 0, 0, 0, 0, 0, 0],
   });
 
   factory WorkoutStatistics.empty() {
     return const WorkoutStatistics(
       totalWorkouts: 0,
+      todayWorkouts: 0,
       currentStreak: 0,
       bestStreak: 0,
       totalCalories: 0,
       totalTime: Duration.zero,
       exerciseCounts: {},
+      weeklyWorkouts: [0, 0, 0, 0, 0, 0, 0],
+      weeklyCalories: [0, 0, 0, 0, 0, 0, 0],
     );
   }
 
   @override
   List<Object?> get props => [
         totalWorkouts,
+        todayWorkouts,
         currentStreak,
         bestStreak,
         totalCalories,
         totalTime,
         exerciseCounts,
         lastWorkoutDate,
+        weeklyWorkouts,
+        weeklyCalories,
       ];
 }
 

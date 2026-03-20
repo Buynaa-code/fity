@@ -7,4 +7,6 @@ abstract class WaterRepository {
   Future<void> removeIntake(String intakeId);
   Future<void> updateDailyGoal(int goalMl);
   Future<int> getDailyGoal();
+  Future<void> resetDailyWater(DateTime date);
+  Future<void> restoreIntakes(DateTime date, List<WaterIntake> intakes);
 }

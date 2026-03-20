@@ -59,6 +59,9 @@ dependencies:
 
   # Dependency injection
   get_it: ^8.0.2
+
+  # Health data (HealthKit/Google Fit)
+  health: ^11.1.0
  
 
 dev_dependencies:
