@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/ui/theme/app_colors.dart';
+import '../../../../core/ui/theme/app_typography.dart';
+import '../../../../core/ui/theme/app_spacing.dart';
 
 class ActiveWorkoutCard extends StatefulWidget {
   final String? activeWorkoutName;
@@ -54,11 +57,11 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
     )..repeat(reverse: true);
 
     _shimmerController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     )..repeat();
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.05).animate(
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.03).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
   }
@@ -73,7 +76,7 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
       child: hasActiveWorkout
           ? _buildActiveWorkoutCard()
           : _TodayWorkoutSection(
@@ -91,37 +94,33 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
 
   Widget _buildActiveWorkoutCard() {
     return Container(
-      height: 200,
+      height: 180,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.secondary, AppColors.secondaryLight],
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: AppColors.secondary.withValues(alpha: 0.35),
             blurRadius: 20,
-            offset: const Offset(0, 10),
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         child: Stack(
           children: [
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [Color(0xFF6C5CE7), Color(0xFFA29BFE)],
-                ),
-              ),
-            ),
             Positioned.fill(
               child: CustomPaint(
                 painter: _PatternPainter(),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -130,28 +129,27 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
                       ScaleTransition(
                         scale: _pulseAnimation,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Container(
-                                width: 8,
-                                height: 8,
+                                width: 6,
+                                height: 6,
                                 decoration: const BoxDecoration(
-                                  color: Colors.greenAccent,
+                                  color: AppColors.levelUp,
                                   shape: BoxShape.circle,
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              const Text(
+                              const SizedBox(width: 6),
+                              Text(
                                 'Идэвхтэй',
-                                style: TextStyle(
+                                style: AppTypography.labelSmall.copyWith(
                                   color: Colors.white,
-                                  fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -161,29 +159,26 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
                       ),
                       const Spacer(),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: Colors.white.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                         ),
                         child: Text(
                           widget.activeWorkoutType ?? 'Workout',
-                          style: const TextStyle(
+                          style: AppTypography.labelSmall.copyWith(
                             color: Colors.white,
-                            fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     widget.activeWorkoutName ?? 'Workout',
-                    style: const TextStyle(
+                    style: AppTypography.headlineMedium.copyWith(
                       color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const Spacer(),
@@ -191,9 +186,9 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
                     children: [
                       _buildWorkoutStat(
                         Icons.access_time_rounded,
-                        '${widget.minutesRemaining} мин үлдсэн',
+                        '${widget.minutesRemaining} мин',
                       ),
-                      const SizedBox(width: 20),
+                      const SizedBox(width: AppSpacing.md),
                       _buildWorkoutStat(
                         Icons.local_fire_department_rounded,
                         '${widget.caloriesBurned ?? 0} kcal',
@@ -205,27 +200,26 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
                           widget.onContinue();
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 'Үргэлжлүүлэх',
-                                style: TextStyle(
-                                  color: Color(0xFF6C5CE7),
+                                style: AppTypography.labelMedium.copyWith(
+                                  color: AppColors.secondary,
                                   fontWeight: FontWeight.w700,
-                                  fontSize: 14,
                                 ),
                               ),
-                              SizedBox(width: 8),
-                              Icon(
+                              const SizedBox(width: 6),
+                              const Icon(
                                 Icons.play_arrow_rounded,
-                                color: Color(0xFF6C5CE7),
-                                size: 20,
+                                color: AppColors.secondary,
+                                size: 18,
                               ),
                             ],
                           ),
@@ -233,27 +227,24 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Stack(
-                    children: [
-                      Container(
-                        height: 6,
-                        decoration: BoxDecoration(
+                  const SizedBox(height: AppSpacing.sm),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 4,
                           color: Colors.white.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(3),
                         ),
-                      ),
-                      FractionallySizedBox(
-                        widthFactor: widget.progress ?? 0.5,
-                        child: Container(
-                          height: 6,
-                          decoration: BoxDecoration(
+                        FractionallySizedBox(
+                          widthFactor: widget.progress ?? 0.5,
+                          child: Container(
+                            height: 4,
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(3),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -267,13 +258,12 @@ class _ActiveWorkoutCardState extends State<ActiveWorkoutCard>
   Widget _buildWorkoutStat(IconData icon, String text) {
     return Row(
       children: [
-        Icon(icon, color: Colors.white70, size: 16),
-        const SizedBox(width: 6),
+        Icon(icon, color: Colors.white70, size: 14),
+        const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(
+          style: AppTypography.bodySmall.copyWith(
             color: Colors.white,
-            fontSize: 13,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -307,67 +297,59 @@ class _TodayWorkoutSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final recommendation = _getTimeBasedRecommendation();
+    final hasCompletedToday = todayWorkouts > 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Гарчиг
+        // Header
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.calendar_today_rounded,
-                  size: 20,
-                  color: isDarkMode ? Colors.white70 : Colors.black54,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Өнөөдрийн дасгал',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: isDarkMode ? Colors.white : Colors.black87,
-                  ),
-                ),
-              ],
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: recommendation.color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+            Text(
+              'Өнөөдрийн дасгал',
+              style: AppTypography.headlineSmall.copyWith(
+                color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    recommendation.timeLabel,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: recommendation.color,
+            ),
+            if (hasCompletedToday)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.check_circle_rounded, color: AppColors.success, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$todayWorkouts хийсэн',
+                      style: AppTypography.labelMedium.copyWith(
+                        color: AppColors.success,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
           ],
         ),
-        const SizedBox(height: 12),
 
-        // Прогресс хэсэг
+        const SizedBox(height: AppSpacing.md),
+
+        // Progress section - simplified
         _buildProgressSection(),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
 
-        // Үндсэн санал
+        // Main recommendation card
         _buildMainRecommendation(recommendation),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: AppSpacing.sm),
 
-        // Хурдан сонголтууд
+        // Quick options
         Row(
           children: [
             Expanded(
@@ -375,25 +357,25 @@ class _TodayWorkoutSection extends StatelessWidget {
                 icon: Icons.flash_on_rounded,
                 label: '15 мин',
                 subtitle: 'Хурдан',
-                color: const Color(0xFFF39C12),
+                color: AppColors.warning,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: _buildQuickOption(
                 icon: Icons.self_improvement_rounded,
                 label: '30 мин',
                 subtitle: 'Стандарт',
-                color: const Color(0xFF3498DB),
+                color: AppColors.info,
               ),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: _buildQuickOption(
                 icon: Icons.fitness_center_rounded,
                 label: '45+ мин',
                 subtitle: 'Бүрэн',
-                color: const Color(0xFF9B59B6),
+                color: AppColors.flexibility,
               ),
             ),
           ],
@@ -406,53 +388,53 @@ class _TodayWorkoutSection extends StatelessWidget {
     final weeklyProgress = weeklyGoal > 0 ? (weeklyCompleted / weeklyGoal).clamp(0.0, 1.0) : 0.0;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: isDarkMode ? AppColors.darkSurface : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+        border: Border.all(
+          color: isDarkMode ? AppColors.darkBorder : AppColors.border.withValues(alpha: 0.5),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: Colors.black.withValues(alpha: isDarkMode ? 0.15 : 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       child: Row(
         children: [
-          // Өнөөдрийн дасгал
           Expanded(
             child: _buildProgressItem(
               icon: Icons.fitness_center_rounded,
-              iconColor: const Color(0xFF9B59B6),
+              iconColor: AppColors.flexibility,
               label: 'Өнөөдөр',
               value: '$todayWorkouts',
-              subtitle: todayWorkouts > 0 ? 'дасгал хийсэн' : 'дасгал хийгээгүй',
+              subtitle: 'дасгал',
               showCheck: todayWorkouts > 0,
             ),
           ),
           Container(
             width: 1,
-            height: 50,
-            color: isDarkMode ? Colors.white12 : Colors.grey[200],
+            height: 40,
+            color: isDarkMode ? AppColors.darkBorder : AppColors.divider,
           ),
-          // Streak
           Expanded(
             child: _buildProgressItem(
               icon: Icons.local_fire_department_rounded,
-              iconColor: const Color(0xFFFE7409),
+              iconColor: AppColors.streak,
               label: 'Streak',
               value: '$currentStreak',
               subtitle: 'хоног',
-              showFire: currentStreak > 0,
+              showFire: currentStreak >= 7,
             ),
           ),
           Container(
             width: 1,
-            height: 50,
-            color: isDarkMode ? Colors.white12 : Colors.grey[200],
+            height: 40,
+            color: isDarkMode ? AppColors.darkBorder : AppColors.divider,
           ),
-          // Долоо хоногийн зорилго
           Expanded(
             child: _buildWeeklyProgressItem(weeklyProgress),
           ),
@@ -470,44 +452,41 @@ class _TodayWorkoutSection extends StatelessWidget {
     bool showCheck = false,
     bool showFire = false,
   }) {
+    final hasValue = int.tryParse(value) != null && int.parse(value) > 0;
+
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: iconColor.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(icon, color: iconColor, size: 16),
+            Icon(
+              icon,
+              color: hasValue ? iconColor : (isDarkMode ? Colors.grey[600] : Colors.grey[400]),
+              size: 18,
             ),
-            if (showCheck) ...[
-              const SizedBox(width: 4),
-              const Icon(Icons.check_circle_rounded, color: Color(0xFF27AE60), size: 14),
-            ],
-            if (showFire && int.tryParse(value) != null && int.parse(value) >= 7) ...[
-              const SizedBox(width: 4),
-              const Text('🔥', style: TextStyle(fontSize: 12)),
+            if (showFire) ...[
+              const SizedBox(width: 2),
+              const Text('🔥', style: TextStyle(fontSize: 10)),
             ],
           ],
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           value,
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: isDarkMode ? Colors.white : Colors.black87,
+          style: AppTypography.titleMedium.copyWith(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: hasValue
+                ? (isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary)
+                : (isDarkMode ? Colors.grey[600] : Colors.grey[400]),
           ),
         ),
         Text(
           subtitle,
-          style: TextStyle(
+          style: AppTypography.labelSmall.copyWith(
+            color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary,
             fontSize: 10,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
           ),
         ),
       ],
@@ -517,43 +496,43 @@ class _TodayWorkoutSection extends StatelessWidget {
   Widget _buildWeeklyProgressItem(double progress) {
     return Column(
       children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 36,
-              height: 36,
-              child: CircularProgressIndicator(
+        SizedBox(
+          width: 32,
+          height: 32,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              CircularProgressIndicator(
                 value: progress,
-                strokeWidth: 4,
-                backgroundColor: isDarkMode ? Colors.white12 : Colors.grey[200],
-                valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF27AE60)),
+                strokeWidth: 3,
+                backgroundColor: isDarkMode ? AppColors.darkBorder : AppColors.border,
+                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success),
               ),
-            ),
-            Text(
-              '${(progress * 100).toInt()}%',
-              style: TextStyle(
-                fontSize: 9,
-                fontWeight: FontWeight.w700,
-                color: isDarkMode ? Colors.white : Colors.black87,
+              Text(
+                '${(progress * 100).toInt()}%',
+                style: AppTypography.labelSmall.copyWith(
+                  fontSize: 8,
+                  fontWeight: FontWeight.w700,
+                  color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         Text(
           '$weeklyCompleted/$weeklyGoal',
-          style: TextStyle(
+          style: AppTypography.titleMedium.copyWith(
             fontSize: 14,
             fontWeight: FontWeight.w700,
-            color: isDarkMode ? Colors.white : Colors.black87,
+            color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
           ),
         ),
         Text(
-          'долоо хоног',
-          style: TextStyle(
+          '7 хоног',
+          style: AppTypography.labelSmall.copyWith(
+            color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary,
             fontSize: 10,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
           ),
         ),
       ],
@@ -561,221 +540,167 @@ class _TodayWorkoutSection extends StatelessWidget {
   }
 
   Widget _buildMainRecommendation(_WorkoutRecommendation recommendation) {
+    if (todayWorkouts >= 3) {
+      return _buildCompletedCard();
+    }
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.mediumImpact();
         onStartWorkout();
       },
-      child: AnimatedBuilder(
-        animation: shimmerController,
-        builder: (context, child) {
-          return Container(
-            height: 190,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: recommendation.color.withValues(alpha: 0.35),
-                  blurRadius: 25,
-                  offset: const Offset(0, 12),
-                ),
-              ],
+      child: Container(
+        height: 175,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: recommendation.gradientColors,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: recommendation.color.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(24),
-              child: Stack(
-                children: [
-                  // Gradient background
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: recommendation.gradientColors,
-                      ),
-                    ),
-                  ),
-
-                  // Animated shimmer effect
-                  Positioned.fill(
-                    child: ShaderMask(
-                      shaderCallback: (bounds) {
-                        return LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Colors.white.withValues(alpha: 0.0),
-                            Colors.white.withValues(alpha: 0.1),
-                            Colors.white.withValues(alpha: 0.0),
-                          ],
-                          stops: [
-                            shimmerController.value - 0.3,
-                            shimmerController.value,
-                            shimmerController.value + 0.3,
-                          ].map((e) => e.clamp(0.0, 1.0)).toList(),
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.srcATop,
-                      child: Container(color: Colors.white),
-                    ),
-                  ),
-
-                  // Pattern overlay
-                  Positioned.fill(
-                    child: CustomPaint(
-                      painter: _ModernPatternPainter(recommendation.color),
-                    ),
-                  ),
-
-                  // Content
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _ModernPatternPainter(recommendation.color),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Top row
+                    Row(
                       children: [
-                        // Top row
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    recommendation.icon,
-                                    color: Colors.white,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Санал болгож байна',
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.95),
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.25),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(
-                                    Icons.star_rounded,
-                                    color: Colors.amber,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '+${recommendation.xpReward} XP',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        // Workout name
-                        Text(
-                          recommendation.title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: -0.5,
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                           ),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        Text(
-                          recommendation.subtitle,
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.85),
-                            fontSize: 14,
-                          ),
-                        ),
-
-                        const Spacer(),
-
-                        // Bottom row with stats and button
-                        Row(
-                          children: [
-                            // Stats
-                            _buildStat(Icons.access_time_rounded, recommendation.duration),
-                            const SizedBox(width: 16),
-                            _buildStat(Icons.local_fire_department_rounded, '${recommendation.calories} kcal'),
-                            const SizedBox(width: 16),
-                            _buildStat(Icons.fitness_center_rounded, '${recommendation.exercises} дасгал'),
-
-                            const Spacer(),
-
-                            // Start button
-                            ScaleTransition(
-                              scale: pulseAnimation,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                                decoration: BoxDecoration(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                recommendation.icon,
+                                color: Colors.white,
+                                size: 12,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                recommendation.timeLabel,
+                                style: AppTypography.labelSmall.copyWith(
                                   color: Colors.white,
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.15),
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Text(
-                                      'Эхлэх',
-                                      style: TextStyle(
-                                        color: recommendation.color,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Icon(
-                                      Icons.arrow_forward_rounded,
-                                      color: recommendation.color,
-                                      size: 18,
-                                    ),
-                                  ],
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Icon(Icons.star_rounded, color: AppColors.badge, size: 12),
+                              const SizedBox(width: 3),
+                              Text(
+                                '+${recommendation.xpReward} XP',
+                                style: AppTypography.labelSmall.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                ],
+
+                    const SizedBox(height: AppSpacing.md),
+
+                    Text(
+                      recommendation.title,
+                      style: AppTypography.headlineMedium.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+
+                    const SizedBox(height: 2),
+
+                    Text(
+                      recommendation.subtitle,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: Colors.white.withValues(alpha: 0.85),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+
+                    const Spacer(),
+
+                    // Bottom row
+                    Row(
+                      children: [
+                        _buildStat(Icons.access_time_rounded, recommendation.duration),
+                        const SizedBox(width: AppSpacing.md),
+                        _buildStat(Icons.local_fire_department_rounded, '${recommendation.calories}'),
+
+                        const Spacer(),
+
+                        ScaleTransition(
+                          scale: pulseAnimation,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Эхлэх',
+                                  style: AppTypography.labelMedium.copyWith(
+                                    color: recommendation.color,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Icon(
+                                  Icons.arrow_forward_rounded,
+                                  color: recommendation.color,
+                                  size: 16,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -787,13 +712,137 @@ class _TodayWorkoutSection extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(
+          style: AppTypography.bodySmall.copyWith(
             color: Colors.white,
-            fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildCompletedCard() {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.mediumImpact();
+        onStartWorkout();
+      },
+      child: Container(
+        height: 150,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+          gradient: AppColors.successGradient,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.success.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: CustomPaint(
+                painter: _ModernPatternPainter(AppColors.success),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        ),
+                        child: const Icon(
+                          Icons.emoji_events_rounded,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Баяр хүргэе!',
+                              style: AppTypography.headlineMedium.copyWith(
+                                color: Colors.white,
+                              ),
+                            ),
+                            Text(
+                              'Өнөөдөр $todayWorkouts дасгал хийлээ',
+                              style: AppTypography.bodySmall.copyWith(
+                                color: Colors.white.withValues(alpha: 0.9),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      if (currentStreak > 0)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('🔥', style: TextStyle(fontSize: 14)),
+                              const SizedBox(width: 4),
+                              Text(
+                                '$currentStreak хоног',
+                                style: AppTypography.labelMedium.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.add_rounded, color: AppColors.success, size: 16),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Нэмэх',
+                              style: AppTypography.labelMedium.copyWith(
+                                color: AppColors.success,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -809,47 +858,44 @@ class _TodayWorkoutSection extends StatelessWidget {
         onStartWorkout();
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.sm),
         decoration: BoxDecoration(
-          color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: isDarkMode ? AppColors.darkSurface : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           border: Border.all(
-            color: color.withValues(alpha: 0.2),
-            width: 1.5,
+            color: isDarkMode ? AppColors.darkBorder : AppColors.border.withValues(alpha: 0.5),
           ),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.1),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              color: Colors.black.withValues(alpha: isDarkMode ? 0.15 : 0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: Icon(icon, color: color, size: 18),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
+              style: AppTypography.labelMedium.copyWith(
                 fontWeight: FontWeight.w700,
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
-            const SizedBox(height: 2),
             Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 11,
-                color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+              style: AppTypography.labelSmall.copyWith(
+                color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary,
+                fontSize: 10,
               ),
             ),
           ],
@@ -864,10 +910,10 @@ class _TodayWorkoutSection extends StatelessWidget {
     if (hour >= 5 && hour < 10) {
       return _WorkoutRecommendation(
         title: 'Өглөөний идэвхжүүлэлт',
-        subtitle: 'Биеэ сэргээж, өдрөө эрчтэй эхлүүлээрэй',
+        subtitle: 'Биеэ сэргээж, өдрөө эхлүүлээрэй',
         icon: Icons.wb_sunny_rounded,
-        color: const Color(0xFFFE7409),
-        gradientColors: [const Color(0xFFFE7409), const Color(0xFFFF9149)],
+        color: AppColors.primary,
+        gradientColors: [AppColors.primary, AppColors.primaryLight],
         duration: '20 мин',
         calories: 150,
         exercises: 8,
@@ -877,10 +923,10 @@ class _TodayWorkoutSection extends StatelessWidget {
     } else if (hour >= 10 && hour < 14) {
       return _WorkoutRecommendation(
         title: 'Идэвхтэй завсарлага',
-        subtitle: 'Ажлын завсарлагаандаа биеэ хөдөлгөө',
+        subtitle: 'Завсарлагаандаа биеэ хөдөлгөөрэй',
         icon: Icons.coffee_rounded,
-        color: const Color(0xFF3498DB),
-        gradientColors: [const Color(0xFF3498DB), const Color(0xFF5DADE2)],
+        color: AppColors.info,
+        gradientColors: [AppColors.info, const Color(0xFF5DADE2)],
         duration: '15 мин',
         calories: 100,
         exercises: 6,
@@ -892,21 +938,21 @@ class _TodayWorkoutSection extends StatelessWidget {
         title: 'Бүрэн биеийн дасгал',
         subtitle: 'Эрч хүч авч, зорилгодоо хүрээрэй',
         icon: Icons.fitness_center_rounded,
-        color: const Color(0xFF9B59B6),
-        gradientColors: [const Color(0xFF9B59B6), const Color(0xFFBB8FCE)],
+        color: AppColors.flexibility,
+        gradientColors: [AppColors.flexibility, const Color(0xFFBB8FCE)],
         duration: '35 мин',
         calories: 280,
         exercises: 12,
         xpReward: 50,
-        timeLabel: 'Үдээс хойш',
+        timeLabel: 'Өдөр',
       );
     } else if (hour >= 18 && hour < 21) {
       return _WorkoutRecommendation(
         title: 'Оройн тайвшруулалт',
         subtitle: 'Стрессээ тайлж, сайн нойрсоорой',
         icon: Icons.nightlight_round,
-        color: const Color(0xFF1ABC9C),
-        gradientColors: [const Color(0xFF1ABC9C), const Color(0xFF48C9B0)],
+        color: AppColors.levelUp,
+        gradientColors: [AppColors.levelUp, const Color(0xFF48C9B0)],
         duration: '25 мин',
         calories: 120,
         exercises: 10,
@@ -918,8 +964,8 @@ class _TodayWorkoutSection extends StatelessWidget {
         title: 'Сунгалт & Тайвшрал',
         subtitle: 'Унтахын өмнө биеэ сулруулаарай',
         icon: Icons.self_improvement_rounded,
-        color: const Color(0xFF6C5CE7),
-        gradientColors: [const Color(0xFF6C5CE7), const Color(0xFFA29BFE)],
+        color: AppColors.secondary,
+        gradientColors: [AppColors.secondary, AppColors.secondaryLight],
         duration: '15 мин',
         calories: 50,
         exercises: 5,

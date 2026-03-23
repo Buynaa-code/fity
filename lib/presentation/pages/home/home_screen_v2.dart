@@ -30,6 +30,7 @@ import 'widgets/today_stats_card.dart';
 import 'widgets/quick_actions_section.dart';
 import 'widgets/active_workout_card.dart';
 import 'widgets/weekly_progress_chart.dart';
+import 'widgets/gym_occupancy_card.dart';
 
 class HomeScreenV2 extends StatefulWidget {
   const HomeScreenV2({super.key});
@@ -200,7 +201,7 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
               _buildNavItem(0, Icons.home_rounded, Icons.home_outlined, 'Нүүр'),
               _buildNavItem(1, Icons.fitness_center_rounded, Icons.fitness_center_outlined, 'Дасгал'),
               const SizedBox(width: 56), // Space for FAB
-              _buildNavItem(3, Icons.emoji_events_rounded, Icons.emoji_events_outlined, 'Сорилт'),
+              _buildNavItem(3, Icons.directions_run_rounded, Icons.directions_run_outlined, 'Марафон'),
               _buildNavItem(4, Icons.person_rounded, Icons.person_outline_rounded, 'Профайл'),
             ],
           ),
@@ -336,10 +337,20 @@ class _HomeContent extends StatelessWidget {
             ),
           ),
 
-          // Active Workout Card
+          // Gym Occupancy Card
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 20),
+              child: GymOccupancyCard(
+                isDarkMode: isDarkMode,
+              ),
+            ),
+          ),
+
+          // Active Workout Card
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 16),
               child: BlocBuilder<StatisticsBloc, StatisticsState>(
                 builder: (context, statsState) {
                   final stats = statsState.workoutStats;

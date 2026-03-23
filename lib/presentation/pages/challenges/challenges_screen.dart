@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../core/services/user_data_service.dart';
 
 class ChallengesScreen extends StatefulWidget {
   const ChallengesScreen({super.key});
@@ -11,286 +10,144 @@ class ChallengesScreen extends StatefulWidget {
 
 class _ChallengesScreenState extends State<ChallengesScreen>
     with TickerProviderStateMixin {
+  late TabController _tabController;
   late AnimationController _animationController;
-  String selectedCategory = 'Бүгд';
 
-  final List<Challenge> challenges = [
-    Challenge(
+  final List<Marathon> _marathons = [
+    Marathon(
       id: '1',
-      title: '30 хоногийн лангуу',
-      description: '30 хоногийн турш өдөр бүр лангуу дасгал хийх',
-      category: 'Хүч чадал',
-      difficulty: ChallengeLevel.medium,
-      duration: const Duration(days: 30),
-      currentProgress: 12,
-      totalSteps: 30,
-      reward: 500,
-      participants: 1245,
+      title: '30 Хоногийн Хувьсал',
+      subtitle: 'Биеийн өөрчлөлтийн аялал',
+      description: '30 хоногийн турш өдөр бүр дасгал хийж, биеийн хувьсалд хүр',
+      type: MarathonType.transformation,
+      totalDays: 30,
+      currentDay: 12,
+      participants: 2456,
+      prize: '500,000₮ + Premium эрх',
+      color: const Color(0xFFFE7409),
+      gradientColors: [const Color(0xFFFE7409), const Color(0xFFFF6B35)],
       isJoined: true,
-      startDate: DateTime.now().subtract(const Duration(days: 12)),
-      endDate: DateTime.now().add(const Duration(days: 18)),
-      icon: Icons.fitness_center_rounded,
-      color: Colors.orange,
-      dailyTarget: 'Өдөрт 20 лангуу',
+      milestones: [
+        Milestone(day: 7, title: '1 долоо хоног', reward: 100, isCompleted: true),
+        Milestone(day: 14, title: '2 долоо хоног', reward: 200, isCompleted: false),
+        Milestone(day: 21, title: '3 долоо хоног', reward: 300, isCompleted: false),
+        Milestone(day: 30, title: 'Амжилт!', reward: 500, isCompleted: false),
+      ],
+      dailyTasks: [
+        DailyTask(title: '20 минут дасгал', isCompleted: true),
+        DailyTask(title: '2L ус уух', isCompleted: true),
+        DailyTask(title: '7 цаг унтах', isCompleted: false),
+      ],
     ),
-    Challenge(
+    Marathon(
       id: '2',
-      title: '10000 алхам',
-      description: 'Өдөр бүр 10000 алхам алхах',
-      category: 'Кардио',
-      difficulty: ChallengeLevel.easy,
-      duration: const Duration(days: 7),
-      currentProgress: 5,
-      totalSteps: 7,
-      reward: 200,
-      participants: 3892,
+      title: '100км Алхалт',
+      subtitle: 'Алхамын тэмцээн',
+      description: 'Сард 100км алхаж, эрүүл амьдралын зуршил бий болго',
+      type: MarathonType.steps,
+      totalDays: 30,
+      currentDay: 18,
+      participants: 5234,
+      prize: '300,000₮',
+      color: const Color(0xFF1ABC9C),
+      gradientColors: [const Color(0xFF1ABC9C), const Color(0xFF16A085)],
       isJoined: true,
-      startDate: DateTime.now().subtract(const Duration(days: 5)),
-      endDate: DateTime.now().add(const Duration(days: 2)),
-      icon: Icons.directions_walk_rounded,
-      color: Colors.green,
-      dailyTarget: '10000 алхам',
+      totalSteps: 100000,
+      currentSteps: 67500,
+      milestones: [
+        Milestone(day: 25000, title: '25км', reward: 50, isCompleted: true),
+        Milestone(day: 50000, title: '50км', reward: 100, isCompleted: true),
+        Milestone(day: 75000, title: '75км', reward: 150, isCompleted: false),
+        Milestone(day: 100000, title: '100км!', reward: 300, isCompleted: false),
+      ],
     ),
-    Challenge(
+    Marathon(
       id: '3',
-      title: 'Планк хүчирхэг',
-      description: '60 секундийн планк дасгалыг хийх чадвар эзэмших',
-      category: 'Гэдэс сүмян',
-      difficulty: ChallengeLevel.hard,
-      duration: const Duration(days: 21),
-      currentProgress: 0,
-      totalSteps: 21,
-      reward: 800,
-      participants: 567,
-      isJoined: false,
-      startDate: DateTime.now().add(const Duration(days: 1)),
-      endDate: DateTime.now().add(const Duration(days: 22)),
-      icon: Icons.self_improvement_rounded,
-      color: Colors.purple,
-      dailyTarget: 'Планк хугацааг нэмэгдүүлэх',
-    ),
-    Challenge(
-      id: '4',
-      title: 'Усны хэмжээ',
-      description: 'Өдөрт 2.5 литр ус уух',
-      category: 'Эрүүл мэнд',
-      difficulty: ChallengeLevel.easy,
-      duration: const Duration(days: 14),
-      currentProgress: 0,
-      totalSteps: 14,
-      reward: 300,
-      participants: 2156,
-      isJoined: false,
-      startDate: DateTime.now(),
-      endDate: DateTime.now().add(const Duration(days: 14)),
-      icon: Icons.water_drop_rounded,
-      color: Colors.blue,
-      dailyTarget: '2.5 литр ус',
-    ),
-    Challenge(
-      id: '5',
-      title: 'Кардио магистр',
-      description: 'Долоо хоног бүр 3 удаа кардио дасгал',
-      category: 'Кардио',
-      difficulty: ChallengeLevel.hard,
-      duration: const Duration(days: 28),
-      currentProgress: 0,
-      totalSteps: 12, // 4 weeks * 3 times per week
-      reward: 1000,
-      participants: 389,
+      title: 'Булчин Бүтээгч',
+      subtitle: 'Хүч чадлын марафон',
+      description: '8 долоо хоногийн турш булчингаа хөгжүүлж, хүч чадлаа нэм',
+      type: MarathonType.strength,
+      totalDays: 56,
+      currentDay: 0,
+      participants: 1823,
+      prize: '1,000,000₮ + Тэжээл',
+      color: const Color(0xFF9B59B6),
+      gradientColors: [const Color(0xFF9B59B6), const Color(0xFF8E44AD)],
       isJoined: false,
       startDate: DateTime.now().add(const Duration(days: 3)),
-      endDate: DateTime.now().add(const Duration(days: 31)),
-      icon: Icons.favorite_rounded,
-      color: Colors.red,
-      dailyTarget: 'Долоо хоногт 3 удаа',
+      milestones: [
+        Milestone(day: 14, title: '2 долоо хоног', reward: 200, isCompleted: false),
+        Milestone(day: 28, title: '4 долоо хоног', reward: 400, isCompleted: false),
+        Milestone(day: 42, title: '6 долоо хоног', reward: 600, isCompleted: false),
+        Milestone(day: 56, title: 'Чемпион!', reward: 1000, isCompleted: false),
+      ],
     ),
+    Marathon(
+      id: '4',
+      title: 'Эрт босогч клуб',
+      subtitle: 'Өглөөний дадал',
+      description: '21 хоног дараалан өглөөний 6 цагт босож, дасгал хий',
+      type: MarathonType.habit,
+      totalDays: 21,
+      currentDay: 0,
+      participants: 892,
+      prize: '200,000₮',
+      color: const Color(0xFFF39C12),
+      gradientColors: [const Color(0xFFF39C12), const Color(0xFFE67E22)],
+      isJoined: false,
+      milestones: [
+        Milestone(day: 7, title: '1 долоо хоног', reward: 50, isCompleted: false),
+        Milestone(day: 14, title: '2 долоо хоног', reward: 100, isCompleted: false),
+        Milestone(day: 21, title: 'Дадал бий боллоо!', reward: 200, isCompleted: false),
+      ],
+    ),
+  ];
+
+  final List<LeaderboardEntry> _leaderboard = [
+    LeaderboardEntry(rank: 1, name: 'Болд', avatar: '🏆', points: 2850, streak: 45),
+    LeaderboardEntry(rank: 2, name: 'Сараа', avatar: '🥈', points: 2720, streak: 38),
+    LeaderboardEntry(rank: 3, name: 'Батаа', avatar: '🥉', points: 2650, streak: 32),
+    LeaderboardEntry(rank: 4, name: 'Оюука', avatar: '💪', points: 2580, streak: 28),
+    LeaderboardEntry(rank: 5, name: 'Түмэн', avatar: '🔥', points: 2490, streak: 25),
+    LeaderboardEntry(rank: 6, name: 'Нараа', avatar: '⭐', points: 2350, streak: 22),
+    LeaderboardEntry(rank: 7, name: 'Ганаа', avatar: '💎', points: 2280, streak: 20),
+    LeaderboardEntry(rank: 8, name: 'Зулаа', avatar: '🎯', points: 2150, streak: 18),
   ];
 
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 800),
       vsync: this,
-    );
-    _animationController.forward();
+    )..forward();
   }
 
   @override
   void dispose() {
+    _tabController.dispose();
     _animationController.dispose();
     super.dispose();
-  }
-
-  List<Challenge> get filteredChallenges {
-    if (selectedCategory == 'Бүгд') return challenges;
-    return challenges.where((c) => c.category == selectedCategory).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text('Сорилцоон'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.leaderboard_rounded),
-            tooltip: 'Үр дүнгийн самбар',
-            onPressed: () {
-              // Navigate to leaderboard
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.add_rounded),
-            tooltip: 'Шинэ сорилцоон',
-            onPressed: () {
-              // Create new challenge
-            },
-          ),
-        ],
-      ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          await Future.delayed(const Duration(seconds: 1));
-          setState(() {});
-        },
+      backgroundColor: const Color(0xFF0D0D0D),
+      body: SafeArea(
         child: Column(
           children: [
-            // Header with statistics
-            Container(
-              margin: const EdgeInsets.all(16),
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Colors.blue.shade600, Colors.blue.shade800],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    offset: const Offset(0, 5),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Таны сорилцоон',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.emoji_events_rounded,
-                          '${challenges.where((c) => c.isJoined).length}',
-                          'Идэвхитэй',
-                          Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.stars_rounded,
-                          '${challenges.where((c) => c.isJoined && c.isCompleted).length}',
-                          'Дууссан',
-                          Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.local_fire_department_rounded,
-                          '${challenges.fold<int>(0, (sum, c) => sum + (c.isJoined ? c.reward : 0))}',
-                          'Нийт оноо',
-                          Colors.white.withValues(alpha: 0.9),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            // Category filters
-            Container(
-              height: 50,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildCategoryChip('Бүгд', selectedCategory == 'Бүгд'),
-                  _buildCategoryChip(
-                    'Хүч чадал',
-                    selectedCategory == 'Хүч чадал',
-                  ),
-                  _buildCategoryChip('Кардио', selectedCategory == 'Кардио'),
-                  _buildCategoryChip(
-                    'Гэдэс сүмян',
-                    selectedCategory == 'Гэдэс сүмян',
-                  ),
-                  _buildCategoryChip(
-                    'Эрүүл мэнд',
-                    selectedCategory == 'Эрүүл мэнд',
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Challenges list
+            _buildHeader(),
+            _buildTabBar(),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: filteredChallenges.length,
-                itemBuilder: (context, index) {
-                  final challenge = filteredChallenges[index];
-                  return AnimatedBuilder(
-                    animation: _animationController,
-                    builder: (context, child) {
-                      final animation = Tween(
-                        begin: const Offset(1.0, 0.0),
-                        end: Offset.zero,
-                      ).animate(
-                        CurvedAnimation(
-                          parent: _animationController,
-                          curve: Interval(
-                            index * 0.1,
-                            1.0,
-                            curve: Curves.easeOutQuart,
-                          ),
-                        ),
-                      );
-
-                      return SlideTransition(
-                        position: animation,
-                        child: FadeTransition(
-                          opacity: _animationController,
-                          child: ChallengeCard(
-                            challenge: challenge,
-                            onJoin: () => _joinChallenge(challenge),
-                            onLeave: () => _leaveChallenge(challenge),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildMarathonsTab(),
+                  _buildLeaderboardTab(),
+                  _buildAchievementsTab(),
+                ],
               ),
             ),
           ],
@@ -299,419 +156,692 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     );
   }
 
-  Widget _buildStatCard(
-    IconData icon,
-    String value,
-    String label,
-    Color textColor,
-  ) {
+  Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
-      ),
-      child: Column(
+      padding: const EdgeInsets.all(20),
+      child: Row(
         children: [
-          Icon(icon, color: textColor, size: 24),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              color: textColor,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Марафон',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Урт хугацааны зорилгод хүрээрэй',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.6),
+                    fontSize: 14,
+                  ),
+                ),
+              ],
             ),
           ),
-          Text(
-            label,
-            style: TextStyle(color: textColor, fontSize: 12),
-            textAlign: TextAlign.center,
+          // User rank badge
+          GestureDetector(
+            onTap: () => _tabController.animateTo(1),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFFFFD700).withValues(alpha: 0.4),
+                    blurRadius: 15,
+                  ),
+                ],
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text('🏅', style: TextStyle(fontSize: 18)),
+                  SizedBox(width: 8),
+                  Text(
+                    '#12',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCategoryChip(String label, bool isSelected) {
+  Widget _buildTabBar() {
     return Container(
-      margin: const EdgeInsets.only(right: 12),
-      child: AnimatedScale(
-        scale: isSelected ? 1.05 : 1.0,
-        duration: const Duration(milliseconds: 200),
-        child: FilterChip(
-          label: Text(label),
-          selected: isSelected,
-          onSelected: (selected) {
-            setState(() {
-              selectedCategory = label;
-            });
-            HapticFeedback.selectionClick();
-          },
-          backgroundColor: Colors.white,
-          selectedColor: Colors.blue.withValues(alpha: 0.2),
-          checkmarkColor: Colors.blue,
-          labelStyle: TextStyle(
-            color: isSelected ? Colors.blue : Colors.grey[600],
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: TabBar(
+        controller: _tabController,
+        indicator: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
           ),
-          elevation: isSelected ? 4 : 1,
-          shadowColor: Colors.blue.withValues(alpha: 0.3),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: BorderSide(
-              color: isSelected ? Colors.blue : Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        indicatorPadding: const EdgeInsets.all(4),
+        labelColor: Colors.white,
+        unselectedLabelColor: Colors.white.withValues(alpha: 0.5),
+        labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+        dividerColor: Colors.transparent,
+        tabs: const [
+          Tab(text: 'Марафон'),
+          Tab(text: 'Тэргүүлэгчид'),
+          Tab(text: 'Амжилт'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarathonsTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Active marathon highlight
+          if (_marathons.any((m) => m.isJoined)) ...[
+            _buildActiveMarathonCard(_marathons.firstWhere((m) => m.isJoined)),
+            const SizedBox(height: 24),
+          ],
+
+          // All marathons
+          const Text(
+            'Бүх марафон',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
             ),
           ),
-        ),
+          const SizedBox(height: 16),
+
+          ..._marathons.map((marathon) => _buildMarathonCard(marathon)),
+        ],
       ),
     );
   }
 
-  void _joinChallenge(Challenge challenge) async {
-    HapticFeedback.mediumImpact();
-
-    // Update local state
-    setState(() {
-      final index = challenges.indexWhere((c) => c.id == challenge.id);
-      if (index != -1) {
-        challenges[index] = challenge.copyWith(isJoined: true);
-      }
-    });
-
-    // Save to persistent storage
-    await UserDataService.instance.joinChallenge(challenge.id);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${challenge.title} сорилцоонд амжилттай нэгдлээ!'),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-
-  void _leaveChallenge(Challenge challenge) async {
-    HapticFeedback.lightImpact();
-
-    // Update local state
-    setState(() {
-      final index = challenges.indexWhere((c) => c.id == challenge.id);
-      if (index != -1) {
-        challenges[index] = challenge.copyWith(isJoined: false);
-      }
-    });
-
-    // Save to persistent storage
-    await UserDataService.instance.leaveChallenge(challenge.id);
-
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('${challenge.title} сорилцооноос гарлаа'),
-        backgroundColor: Colors.orange,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    );
-  }
-}
-
-class ChallengeCard extends StatelessWidget {
-  final Challenge challenge;
-  final VoidCallback onJoin;
-  final VoidCallback onLeave;
-
-  const ChallengeCard({
-    super.key,
-    required this.challenge,
-    required this.onJoin,
-    required this.onLeave,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isStartingSoon = challenge.startDate.isAfter(DateTime.now());
-    final isActive = !isStartingSoon && !challenge.isCompleted;
-    final progressPercent = challenge.currentProgress / challenge.totalSteps;
+  Widget _buildActiveMarathonCard(Marathon marathon) {
+    final progress = marathon.currentDay / marathon.totalDays;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Card(
-        elevation: challenge.isJoined ? 6 : 3,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-          side:
-              challenge.isJoined
-                  ? BorderSide(color: challenge.color, width: 2)
-                  : BorderSide.none,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: marathon.gradientColors,
         ),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient:
-                challenge.isJoined
-                    ? LinearGradient(
-                      colors: [
-                        challenge.color.withValues(alpha: 0.1),
-                        challenge.color.withValues(alpha: 0.05),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    )
-                    : null,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: marathon.color.withValues(alpha: 0.4),
+            blurRadius: 25,
+            offset: const Offset(0, 10),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header
-                Row(
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            challenge.color,
-                            challenge.color.withValues(alpha: 0.7),
-                          ],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: challenge.color.withValues(alpha: 0.3),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        challenge.icon,
+                    Icon(Icons.local_fire_department, color: Colors.white, size: 16),
+                    SizedBox(width: 6),
+                    Text(
+                      'Идэвхтэй',
+                      style: TextStyle(
                         color: Colors.white,
-                        size: 24,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
                       ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            challenge.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              _buildDifficultyBadge(),
-                              const SizedBox(width: 8),
-                              _buildStatusBadge(isStartingSoon, isActive),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      children: [
-                        Icon(
-                          Icons.stars_rounded,
-                          color: Colors.amber,
-                          size: 20,
-                        ),
-                        Text(
-                          '${challenge.reward}',
-                          style: TextStyle(
-                            color: Colors.amber.shade700,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
                     ),
                   ],
                 ),
+              ),
+              const Spacer(),
+              Text(
+                '${marathon.currentDay}/${marathon.totalDays} хоног',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.9),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
 
-                const SizedBox(height: 16),
+          Text(
+            marathon.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            marathon.description,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.85),
+              fontSize: 14,
+            ),
+          ),
 
-                // Description
-                Text(
-                  challenge.description,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
-                    height: 1.4,
+          const SizedBox(height: 20),
+
+          // Progress bar
+          Stack(
+            children: [
+              Container(
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              FractionallySizedBox(
+                widthFactor: progress,
+                child: Container(
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        blurRadius: 8,
+                      ),
+                    ],
                   ),
                 ),
+              ),
+            ],
+          ),
 
-                const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
-                // Daily target
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
+          // Daily tasks
+          if (marathon.dailyTasks != null) ...[
+            const Text(
+              'Өнөөдрийн даалгавар',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 10),
+            ...marathon.dailyTasks!.map((task) => _buildDailyTaskItem(task)),
+          ],
+
+          const SizedBox(height: 16),
+
+          // Milestones preview
+          Row(
+            children: marathon.milestones.map((milestone) {
+              final isNext = !milestone.isCompleted &&
+                  marathon.milestones.where((m) => !m.isCompleted).first == milestone;
+              return Expanded(
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: BoxDecoration(
-                    color: challenge.color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: challenge.color.withValues(alpha: 0.3),
-                    ),
+                    color: milestone.isCompleted
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : isNext
+                            ? Colors.white.withValues(alpha: 0.15)
+                            : Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(10),
+                    border: isNext
+                        ? Border.all(color: Colors.white.withValues(alpha: 0.5))
+                        : null,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Column(
                     children: [
                       Icon(
-                        Icons.track_changes_rounded,
-                        size: 16,
-                        color: challenge.color,
+                        milestone.isCompleted ? Icons.check_circle : Icons.circle_outlined,
+                        color: Colors.white.withValues(alpha: milestone.isCompleted ? 1 : 0.6),
+                        size: 18,
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(height: 4),
                       Text(
-                        challenge.dailyTarget,
+                        milestone.title,
                         style: TextStyle(
-                          color: challenge.color,
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 10,
                           fontWeight: FontWeight.w600,
-                          fontSize: 12,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyTaskItem(DailyTask task) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: task.isCompleted
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: task.isCompleted
+                ? const Icon(Icons.check, color: Color(0xFFFE7409), size: 16)
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            task.title,
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: task.isCompleted ? 0.7 : 1),
+              fontSize: 14,
+              decoration: task.isCompleted ? TextDecoration.lineThrough : null,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarathonCard(Marathon marathon) {
+    final isUpcoming = marathon.startDate?.isAfter(DateTime.now()) ?? false;
+
+    return GestureDetector(
+      onTap: () => _showMarathonDetail(marathon),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.circular(20),
+          border: marathon.isJoined
+              ? Border.all(color: marathon.color.withValues(alpha: 0.5), width: 2)
+              : null,
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: marathon.gradientColors),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(
+                    _getMarathonIcon(marathon.type),
+                    color: Colors.white,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              marathon.title,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                          if (isUpcoming)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withValues(alpha: 0.2),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                'Удахгүй',
+                                style: TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        marathon.subtitle,
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 13,
                         ),
                       ),
                     ],
                   ),
                 ),
+              ],
+            ),
 
-                const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-                // Progress (if joined)
-                if (challenge.isJoined) ...[
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+            // Stats row
+            Row(
+              children: [
+                _buildMarathonStat(Icons.calendar_today, '${marathon.totalDays} хоног'),
+                const SizedBox(width: 20),
+                _buildMarathonStat(Icons.people, '${marathon.participants}'),
+                const SizedBox(width: 20),
+                _buildMarathonStat(Icons.emoji_events, marathon.prize),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Action button
+            if (!marathon.isJoined)
+              GestureDetector(
+                onTap: () => _joinMarathon(marathon),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: marathon.gradientColors),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'Нэгдэх',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Явц',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.grey[700],
-                                  ),
-                                ),
-                                Text(
-                                  '${challenge.currentProgress}/${challenge.totalSteps}',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: challenge.color,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Container(
-                              height: 8,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withValues(alpha: 0.2),
-                                    blurRadius: 4,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
+                            Text(
+                              'Явц',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.6),
+                                fontSize: 12,
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: progressPercent,
-                                  backgroundColor: Colors.grey.shade200,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    challenge.color,
-                                  ),
-                                  minHeight: 8,
-                                ),
+                            ),
+                            Text(
+                              '${((marathon.currentDay / marathon.totalDays) * 100).toInt()}%',
+                              style: TextStyle(
+                                color: marathon.color,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 14,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Text(
-                        '${(progressPercent * 100).toInt()}%',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: challenge.color,
+                        const SizedBox(height: 8),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: marathon.currentDay / marathon.totalDays,
+                            backgroundColor: Colors.white.withValues(alpha: 0.1),
+                            valueColor: AlwaysStoppedAnimation(marathon.color),
+                            minHeight: 6,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(width: 16),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: marathon.color.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: marathon.color,
+                      size: 20,
+                    ),
+                  ),
                 ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                // Footer with participants and action
+  Widget _buildMarathonStat(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, color: Colors.white.withValues(alpha: 0.5), size: 16),
+        const SizedBox(width: 6),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLeaderboardTab() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          // Top 3 podium
+          _buildPodium(),
+          const SizedBox(height: 24),
+
+          // Rest of leaderboard
+          Container(
+            decoration: BoxDecoration(
+              color: const Color(0xFF1A1A1A),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Column(
+              children: _leaderboard.skip(3).map((entry) => _buildLeaderboardRow(entry)).toList(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPodium() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        // 2nd place
+        Expanded(child: _buildPodiumItem(_leaderboard[1], 100, const Color(0xFFC0C0C0))),
+        // 1st place
+        Expanded(child: _buildPodiumItem(_leaderboard[0], 130, const Color(0xFFFFD700))),
+        // 3rd place
+        Expanded(child: _buildPodiumItem(_leaderboard[2], 80, const Color(0xFFCD7F32))),
+      ],
+    );
+  }
+
+  Widget _buildPodiumItem(LeaderboardEntry entry, double height, Color color) {
+    return Column(
+      children: [
+        Text(
+          entry.avatar,
+          style: const TextStyle(fontSize: 40),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          entry.name,
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 15,
+          ),
+        ),
+        Text(
+          '${entry.points} XP',
+          style: TextStyle(
+            color: color,
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          height: height,
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [color.withValues(alpha: 0.8), color.withValues(alpha: 0.4)],
+            ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+          ),
+          child: Center(
+            child: Text(
+              '#${entry.rank}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w800,
+                fontSize: 24,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLeaderboardRow(LeaderboardEntry entry) {
+    final isCurrentUser = entry.rank == 12;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      decoration: BoxDecoration(
+        color: isCurrentUser ? const Color(0xFFFE7409).withValues(alpha: 0.1) : null,
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 30,
+            child: Text(
+              '#${entry.rank}',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.6),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(entry.avatar, style: const TextStyle(fontSize: 24)),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  entry.name,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                  ),
+                ),
                 Row(
                   children: [
-                    Icon(
-                      Icons.group_rounded,
-                      size: 16,
-                      color: Colors.grey[600],
-                    ),
+                    Icon(Icons.local_fire_department, color: Colors.orange, size: 14),
                     const SizedBox(width: 4),
                     Text(
-                      '${challenge.participants} хүн оролцож байна',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                      '${entry.streak} хоног',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.5),
+                        fontSize: 12,
+                      ),
                     ),
-                    const Spacer(),
-                    _buildActionButton(),
                   ],
                 ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDifficultyBadge() {
-    final difficultyData = _getDifficultyData(challenge.difficulty);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: difficultyData['color'].withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: difficultyData['color'].withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            difficultyData['icon'],
-            size: 12,
-            color: difficultyData['color'],
+          Text(
+            '${entry.points}',
+            style: const TextStyle(
+              color: Color(0xFFFE7409),
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+            ),
           ),
           const SizedBox(width: 4),
           Text(
-            difficultyData['text'],
+            'XP',
             style: TextStyle(
-              color: difficultyData['color'],
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
+              color: Colors.white.withValues(alpha: 0.5),
+              fontSize: 12,
             ),
           ),
         ],
@@ -719,47 +849,125 @@ class ChallengeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge(bool isStartingSoon, bool isActive) {
-    String text;
-    Color color;
-    IconData icon;
-
-    if (challenge.isCompleted) {
-      text = 'Дууссан';
-      color = Colors.green;
-      icon = Icons.check_circle_rounded;
-    } else if (isStartingSoon) {
-      text = 'Удахгүй';
-      color = Colors.orange;
-      icon = Icons.schedule_rounded;
-    } else if (isActive) {
-      text = 'Идэвхитэй';
-      color = Colors.blue;
-      icon = Icons.play_circle_rounded;
-    } else {
-      text = 'Дууссан';
-      color = Colors.grey;
-      icon = Icons.stop_circle_rounded;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+  Widget _buildAchievementsTab() {
+    final achievements = [
+      Achievement(
+        icon: '🔥',
+        title: '7 хоногийн streak',
+        description: '7 хоног дараалан дасгал хийсэн',
+        isUnlocked: true,
+        xp: 100,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      Achievement(
+        icon: '💪',
+        title: 'Анхны марафон',
+        description: 'Марафонд анх удаа нэгдсэн',
+        isUnlocked: true,
+        xp: 50,
+      ),
+      Achievement(
+        icon: '🏃',
+        title: '10км алхагч',
+        description: 'Нэг өдөрт 10км алхсан',
+        isUnlocked: true,
+        xp: 75,
+      ),
+      Achievement(
+        icon: '🏆',
+        title: 'Марафон дүүргэгч',
+        description: 'Марафон бүрэн дуусгасан',
+        isUnlocked: false,
+        xp: 500,
+      ),
+      Achievement(
+        icon: '⭐',
+        title: 'Топ 10',
+        description: 'Leaderboard топ 10-д орсон',
+        isUnlocked: false,
+        xp: 200,
+      ),
+      Achievement(
+        icon: '🎯',
+        title: '30 хоногийн мастер',
+        description: '30 хоног дараалан идэвхтэй',
+        isUnlocked: false,
+        xp: 300,
+      ),
+    ];
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(20),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 0.85,
+      ),
+      itemCount: achievements.length,
+      itemBuilder: (context, index) => _buildAchievementCard(achievements[index]),
+    );
+  }
+
+  Widget _buildAchievementCard(Achievement achievement) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: achievement.isUnlocked
+            ? const Color(0xFF1A1A1A)
+            : const Color(0xFF1A1A1A).withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(20),
+        border: achievement.isUnlocked
+            ? Border.all(color: const Color(0xFFFE7409).withValues(alpha: 0.3))
+            : null,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 12, color: color),
-          const SizedBox(width: 4),
           Text(
-            text,
+            achievement.icon,
             style: TextStyle(
-              color: color,
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
+              fontSize: 40,
+              color: achievement.isUnlocked ? null : Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            achievement.title,
+            style: TextStyle(
+              color: achievement.isUnlocked ? Colors.white : Colors.grey,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            achievement.description,
+            style: TextStyle(
+              color: achievement.isUnlocked
+                  ? Colors.white.withValues(alpha: 0.6)
+                  : Colors.grey.withValues(alpha: 0.5),
+              fontSize: 11,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+          ),
+          const Spacer(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+              color: achievement.isUnlocked
+                  ? const Color(0xFFFE7409).withValues(alpha: 0.2)
+                  : Colors.grey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(
+              '+${achievement.xp} XP',
+              style: TextStyle(
+                color: achievement.isUnlocked ? const Color(0xFFFE7409) : Colors.grey,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
             ),
           ),
         ],
@@ -767,136 +975,156 @@ class ChallengeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton() {
-    if (challenge.isJoined) {
-      return TextButton.icon(
-        onPressed: onLeave,
-        icon: const Icon(Icons.exit_to_app_rounded, size: 16),
-        label: const Text('Гарах'),
-        style: TextButton.styleFrom(
-          foregroundColor: Colors.red,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        ),
-      );
-    } else {
-      return ElevatedButton.icon(
-        onPressed: onJoin,
-        icon: const Icon(Icons.add_rounded, size: 16),
-        label: const Text('Нэгдэх'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: challenge.color,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          elevation: 2,
-        ),
-      );
+  IconData _getMarathonIcon(MarathonType type) {
+    switch (type) {
+      case MarathonType.transformation:
+        return Icons.auto_awesome;
+      case MarathonType.steps:
+        return Icons.directions_walk;
+      case MarathonType.strength:
+        return Icons.fitness_center;
+      case MarathonType.habit:
+        return Icons.wb_sunny;
     }
   }
 
-  Map<String, dynamic> _getDifficultyData(ChallengeLevel level) {
-    switch (level) {
-      case ChallengeLevel.easy:
-        return {
-          'text': 'Амархан',
-          'color': Colors.green,
-          'icon': Icons.sentiment_very_satisfied_rounded,
-        };
-      case ChallengeLevel.medium:
-        return {
-          'text': 'Дундаж',
-          'color': Colors.orange,
-          'icon': Icons.sentiment_neutral_rounded,
-        };
-      case ChallengeLevel.hard:
-        return {
-          'text': 'Хүнд',
-          'color': Colors.red,
-          'icon': Icons.sentiment_very_dissatisfied_rounded,
-        };
-    }
+  void _joinMarathon(Marathon marathon) {
+    HapticFeedback.heavyImpact();
+    setState(() {
+      final index = _marathons.indexWhere((m) => m.id == marathon.id);
+      if (index != -1) {
+        _marathons[index] = Marathon(
+          id: marathon.id,
+          title: marathon.title,
+          subtitle: marathon.subtitle,
+          description: marathon.description,
+          type: marathon.type,
+          totalDays: marathon.totalDays,
+          currentDay: 0,
+          participants: marathon.participants + 1,
+          prize: marathon.prize,
+          color: marathon.color,
+          gradientColors: marathon.gradientColors,
+          isJoined: true,
+          milestones: marathon.milestones,
+        );
+      }
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 12),
+            Text('${marathon.title} марафонд нэгдлээ!'),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1ABC9C),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      ),
+    );
+  }
+
+  void _showMarathonDetail(Marathon marathon) {
+    HapticFeedback.lightImpact();
+    // TODO: Navigate to marathon detail screen
   }
 }
 
 // Data Models
-enum ChallengeLevel { easy, medium, hard }
+enum MarathonType { transformation, steps, strength, habit }
 
-class Challenge {
+class Marathon {
   final String id;
   final String title;
+  final String subtitle;
   final String description;
-  final String category;
-  final ChallengeLevel difficulty;
-  final Duration duration;
-  final int currentProgress;
-  final int totalSteps;
-  final int reward;
+  final MarathonType type;
+  final int totalDays;
+  final int currentDay;
   final int participants;
-  final bool isJoined;
-  final DateTime startDate;
-  final DateTime endDate;
-  final IconData icon;
+  final String prize;
   final Color color;
-  final String dailyTarget;
+  final List<Color> gradientColors;
+  final bool isJoined;
+  final DateTime? startDate;
+  final List<Milestone> milestones;
+  final int? totalSteps;
+  final int? currentSteps;
+  final List<DailyTask>? dailyTasks;
 
-  Challenge({
+  Marathon({
     required this.id,
     required this.title,
+    required this.subtitle,
     required this.description,
-    required this.category,
-    required this.difficulty,
-    required this.duration,
-    required this.currentProgress,
-    required this.totalSteps,
-    required this.reward,
+    required this.type,
+    required this.totalDays,
+    required this.currentDay,
     required this.participants,
-    required this.isJoined,
-    required this.startDate,
-    required this.endDate,
-    required this.icon,
+    required this.prize,
     required this.color,
-    required this.dailyTarget,
+    required this.gradientColors,
+    required this.isJoined,
+    this.startDate,
+    required this.milestones,
+    this.totalSteps,
+    this.currentSteps,
+    this.dailyTasks,
   });
+}
 
-  bool get isCompleted => currentProgress >= totalSteps;
+class Milestone {
+  final int day;
+  final String title;
+  final int reward;
+  final bool isCompleted;
 
-  Challenge copyWith({
-    String? id,
-    String? title,
-    String? description,
-    String? category,
-    ChallengeLevel? difficulty,
-    Duration? duration,
-    int? currentProgress,
-    int? totalSteps,
-    int? reward,
-    int? participants,
-    bool? isJoined,
-    DateTime? startDate,
-    DateTime? endDate,
-    IconData? icon,
-    Color? color,
-    String? dailyTarget,
-  }) {
-    return Challenge(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      category: category ?? this.category,
-      difficulty: difficulty ?? this.difficulty,
-      duration: duration ?? this.duration,
-      currentProgress: currentProgress ?? this.currentProgress,
-      totalSteps: totalSteps ?? this.totalSteps,
-      reward: reward ?? this.reward,
-      participants: participants ?? this.participants,
-      isJoined: isJoined ?? this.isJoined,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      icon: icon ?? this.icon,
-      color: color ?? this.color,
-      dailyTarget: dailyTarget ?? this.dailyTarget,
-    );
-  }
+  Milestone({
+    required this.day,
+    required this.title,
+    required this.reward,
+    required this.isCompleted,
+  });
+}
+
+class DailyTask {
+  final String title;
+  final bool isCompleted;
+
+  DailyTask({required this.title, required this.isCompleted});
+}
+
+class LeaderboardEntry {
+  final int rank;
+  final String name;
+  final String avatar;
+  final int points;
+  final int streak;
+
+  LeaderboardEntry({
+    required this.rank,
+    required this.name,
+    required this.avatar,
+    required this.points,
+    required this.streak,
+  });
+}
+
+class Achievement {
+  final String icon;
+  final String title;
+  final String description;
+  final bool isUnlocked;
+  final int xp;
+
+  Achievement({
+    required this.icon,
+    required this.title,
+    required this.description,
+    required this.isUnlocked,
+    required this.xp,
+  });
 }

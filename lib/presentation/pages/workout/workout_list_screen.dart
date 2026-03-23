@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../features/statistics/presentation/bloc/statistics_bloc.dart';
+import '../../../features/statistics/presentation/bloc/statistics_event.dart';
 import 'workout_timer_screen.dart';
 
 class WorkoutListScreen extends StatefulWidget {
@@ -829,8 +832,69 @@ class _WorkoutListScreenState extends State<WorkoutListScreen>
           );
         });
         _saveWorkoutData();
+
+        // Record workout in StatisticsBloc
+        final calories = exercise.caloriesPerSet * exercise.sets;
+        final duration = Duration(minutes: exercise.estimatedMinutes);
+        if (mounted) {
+          context.read<StatisticsBloc>().add(RecordWorkout(
+            exerciseName: exercise.name,
+            calories: calories.toDouble(),
+            duration: duration,
+          ));
+
+          // Show completion feedback
+          _showCompletionFeedback(exercise);
+        }
       }
     });
+  }
+
+  void _showCompletionFeedback(WorkoutExercise exercise) {
+    final calories = exercise.caloriesPerSet * exercise.sets;
+    final xpEarned = 10;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.check_circle_rounded, color: Colors.white, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${exercise.name} дууслаа!',
+                    style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                  ),
+                  Text(
+                    '$calories kcal  •  +$xpEarned XP',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.green.shade600,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        duration: const Duration(seconds: 3),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
   }
 
   void _showExerciseDetail(WorkoutExercise exercise) {

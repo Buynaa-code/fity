@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/ui/theme/app_colors.dart';
+import '../../../../core/ui/theme/app_typography.dart';
+import '../../../../core/ui/theme/app_spacing.dart';
 
 class HomeHeader extends StatelessWidget {
   final String userName;
@@ -33,32 +36,22 @@ class HomeHeader extends StatelessWidget {
     return 'Орой мэнд';
   }
 
-  String get _motivationalMessage {
-    final hour = DateTime.now().hour;
-    if (hour >= 5 && hour < 10) return 'Өглөөний дасгал хийх цаг боллоо!';
-    if (hour >= 10 && hour < 14) return 'Идэвхитэй байх цаг!';
-    if (hour >= 14 && hour < 18) return 'Өдрийн дундын эрч!';
-    if (hour >= 18 && hour < 21) return 'Оройн дасгалд бэлэн үү?';
-    return 'Сайн амраарай!';
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20, MediaQuery.of(context).padding.top + 16, 20, 24),
+      padding: EdgeInsets.fromLTRB(
+        AppSpacing.screenPadding,
+        MediaQuery.of(context).padding.top + AppSpacing.md,
+        AppSpacing.screenPadding,
+        AppSpacing.lg,
+      ),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: isDarkMode
-              ? [const Color(0xFF1E1E1E), const Color(0xFF2D2D2D)]
-              : [Colors.white, Colors.grey.shade50],
-        ),
+        color: isDarkMode ? AppColors.darkBackground : AppColors.background,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top row with actions
+          // Top row - Profile and Actions
           Row(
             children: [
               // Profile avatar with level indicator
@@ -67,57 +60,55 @@ class HomeHeader extends StatelessWidget {
                   HapticFeedback.lightImpact();
                   onProfileTap();
                 },
-                child: Stack(
-                  children: [
-                    Container(
-                      width: 56,
-                      height: 56,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFFFE7409).withValues(alpha: 0.4),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                child: Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                    gradient: AppColors.primaryGradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
-                      child: const Icon(Icons.person_rounded, color: Colors.white, size: 28),
-                    ),
-                    // Level badge
-                    Positioned(
-                      right: -2,
-                      bottom: -2,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF6C5CE7), Color(0xFFA29BFE)],
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      const Center(
+                        child: Icon(Icons.person_rounded, color: Colors.white, size: 26),
+                      ),
+                      // Level badge
+                      Positioned(
+                        right: -2,
+                        bottom: -2,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.secondary,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isDarkMode ? AppColors.darkBackground : AppColors.background,
+                              width: 2,
+                            ),
                           ),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-                            width: 2,
-                          ),
-                        ),
-                        child: Text(
-                          'L$level',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w800,
+                          child: Text(
+                            '$level',
+                            style: AppTypography.labelSmall.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 9,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
 
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.md),
 
               // Greeting and name
               Expanded(
@@ -126,39 +117,32 @@ class HomeHeader extends StatelessWidget {
                   children: [
                     Text(
                       _greeting,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
-                        fontWeight: FontWeight.w500,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary,
                       ),
                     ),
-                    const SizedBox(height: 2),
                     Text(
-                      '$userName! 💪',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
-                        color: isDarkMode ? Colors.white : Colors.black87,
+                      userName,
+                      style: AppTypography.headlineMedium.copyWith(
+                        color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
 
-              // Theme toggle
+              // Action buttons
               _buildIconButton(
                 icon: isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
                 onTap: onThemeToggle,
-                color: isDarkMode ? Colors.amber : Colors.grey[700],
               ),
-
-              const SizedBox(width: 12),
-
-              // Notifications
+              const SizedBox(width: AppSpacing.sm),
               Stack(
                 children: [
                   _buildIconButton(
-                    icon: Icons.notifications_rounded,
+                    icon: Icons.notifications_outlined,
                     onTap: onNotificationTap,
                   ),
                   if (notificationCount > 0)
@@ -166,18 +150,18 @@ class HomeHeader extends StatelessWidget {
                       right: 0,
                       top: 0,
                       child: Container(
-                        width: 18,
-                        height: 18,
+                        width: 16,
+                        height: 16,
                         decoration: const BoxDecoration(
-                          color: Color(0xFFFE7409),
+                          color: AppColors.error,
                           shape: BoxShape.circle,
                         ),
                         child: Center(
                           child: Text(
                             notificationCount > 9 ? '9+' : '$notificationCount',
-                            style: const TextStyle(
+                            style: AppTypography.labelSmall.copyWith(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: 8,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -189,19 +173,24 @@ class HomeHeader extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: AppSpacing.lg),
 
-          // Stats row
+          // Stats row - clean minimal design
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.md,
+            ),
             decoration: BoxDecoration(
-              color: isDarkMode
-                  ? Colors.white.withValues(alpha: 0.05)
-                  : const Color(0xFFFE7409).withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: const Color(0xFFFE7409).withValues(alpha: 0.2),
-              ),
+              color: isDarkMode ? AppColors.darkSurface : AppColors.surface,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDarkMode ? 0.2 : 0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -209,55 +198,27 @@ class HomeHeader extends StatelessWidget {
                 _buildStatItem(
                   icon: Icons.local_fire_department_rounded,
                   value: '$streakDays',
-                  label: 'Streak',
-                  color: Colors.orange,
+                  label: 'өдөр',
+                  color: AppColors.streak,
+                  hasValue: streakDays > 0,
                 ),
                 _buildDivider(),
                 // Level
                 _buildStatItem(
-                  icon: Icons.military_tech_rounded,
-                  value: 'Level $level',
-                  label: 'Түвшин',
-                  color: Colors.purple,
+                  icon: Icons.workspace_premium_rounded,
+                  value: 'Lv.$level',
+                  label: 'түвшин',
+                  color: AppColors.secondary,
+                  hasValue: true,
                 ),
                 _buildDivider(),
                 // XP
                 _buildStatItem(
-                  icon: Icons.stars_rounded,
+                  icon: Icons.star_rounded,
                   value: _formatXp(totalXp),
                   label: 'XP',
-                  color: Colors.amber,
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          // Motivational message
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFFFE7409).withValues(alpha: 0.1),
-                  const Color(0xFFFF9149).withValues(alpha: 0.05),
-                ],
-              ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                const Text('💡', style: TextStyle(fontSize: 20)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    _motivationalMessage,
-                    style: TextStyle(
-                      color: isDarkMode ? Colors.white70 : Colors.grey[700],
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  color: AppColors.badge,
+                  hasValue: totalXp > 0,
                 ),
               ],
             ),
@@ -270,7 +231,6 @@ class HomeHeader extends StatelessWidget {
   Widget _buildIconButton({
     required IconData icon,
     required VoidCallback onTap,
-    Color? color,
   }) {
     return GestureDetector(
       onTap: () {
@@ -278,15 +238,18 @@ class HomeHeader extends StatelessWidget {
         onTap();
       },
       child: Container(
-        padding: const EdgeInsets.all(12),
+        width: 44,
+        height: 44,
         decoration: BoxDecoration(
-          color: isDarkMode ? Colors.white.withValues(alpha: 0.08) : Colors.grey[100],
-          borderRadius: BorderRadius.circular(14),
+          color: isDarkMode
+              ? AppColors.darkSurfaceVariant
+              : AppColors.surfaceVariant,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         ),
         child: Icon(
           icon,
           size: 22,
-          color: color ?? (isDarkMode ? Colors.grey[400] : Colors.grey[700]),
+          color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textSecondary,
         ),
       ),
     );
@@ -297,32 +260,39 @@ class HomeHeader extends StatelessWidget {
     required String value,
     required String label,
     required Color color,
+    required bool hasValue,
   }) {
     return Expanded(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
         children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
+              Icon(
+                icon,
+                color: hasValue ? color : (isDarkMode ? Colors.grey[600] : Colors.grey[400]),
+                size: 18,
+              ),
+              const SizedBox(width: 6),
               Text(
                 value,
-                style: TextStyle(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 16,
-                  color: isDarkMode ? Colors.white : Colors.black87,
-                ),
-              ),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: isDarkMode ? Colors.grey[500] : Colors.grey[600],
+                style: AppTypography.titleMedium.copyWith(
+                  color: hasValue
+                      ? (isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary)
+                      : (isDarkMode ? Colors.grey[600] : Colors.grey[400]),
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: AppTypography.labelSmall.copyWith(
+              color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary,
+              fontSize: 10,
+            ),
           ),
         ],
       ),
@@ -332,9 +302,9 @@ class HomeHeader extends StatelessWidget {
   Widget _buildDivider() {
     return Container(
       width: 1,
-      height: 40,
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      color: isDarkMode ? Colors.grey[700] : Colors.grey[300],
+      height: 32,
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+      color: isDarkMode ? AppColors.darkBorder : AppColors.divider,
     );
   }
 

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
+// Re-export brand colors for backward compatibility
+export '../../branding/brand_config.dart' show BrandColors, BrandGradients, BrandShadows, BrandRadius, BrandSpacing, BrandAnimations;
+
 /// App color system based on fitness app color psychology
+/// @deprecated Use BrandColors instead
 /// Orange/Red: CTAs, active states, intensity - Energy, urgency, action
 /// Green: Success, completion, health - Achievement, wellness
 /// Blue: Rest periods, recovery, data - Trust, calm, stability
@@ -16,7 +20,7 @@ class AppColors {
   static const Color secondaryLight = Color(0xFF8B7EF0);
 
   // Semantic colors
-  static const Color success = Color(0xFF00C853);
+  static const Color success = Color(0xFF27AE60);
   static const Color successLight = Color(0xFFE8F5E9);
   static const Color warning = Color(0xFFF39C12);
   static const Color warningLight = Color(0xFFFFF8E1);
@@ -41,9 +45,9 @@ class AppColors {
   static const Color textOnPrimary = Color(0xFFFFFFFF);
 
   // Dark mode colors
-  static const Color darkBackground = Color(0xFF121212);
-  static const Color darkSurface = Color(0xFF1E1E1E);
-  static const Color darkSurfaceVariant = Color(0xFF2A2A2A);
+  static const Color darkBackground = Color(0xFF0D0D0D);
+  static const Color darkSurface = Color(0xFF1A1A1A);
+  static const Color darkSurfaceVariant = Color(0xFF262626);
   static const Color darkBorder = Color(0xFF333333);
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
   static const Color darkTextSecondary = Color(0xFFB3B3B3);
@@ -72,7 +76,7 @@ class AppColors {
   );
 
   static const LinearGradient successGradient = LinearGradient(
-    colors: [Color(0xFF00C853), Color(0xFF69F0AE)],
+    colors: [Color(0xFF27AE60), Color(0xFF2ECC71)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
