@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../domain/enums/user_role.dart';
 
 abstract class UserEvent extends Equatable {
   const UserEvent();
@@ -17,4 +18,13 @@ class RefreshUser extends UserEvent {
 
 class SignOut extends UserEvent {
   const SignOut();
+}
+
+class UpdateUserRole extends UserEvent {
+  final UserRole role;
+
+  const UpdateUserRole(this.role);
+
+  @override
+  List<Object?> get props => [role];
 }

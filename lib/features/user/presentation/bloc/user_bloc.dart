@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../data/datasources/auth/auth_service.dart';
+import '../../domain/enums/user_role.dart';
 import 'user_event.dart';
 import 'user_state.dart';
 
@@ -11,6 +12,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   static const String _userEmailKey = 'user_email';
   static const String _userPhotoKey = 'user_photo';
   static const String _userIdKey = 'user_id';
+  static const String _userRoleKey = 'user_role';
 
   UserBloc({required SharedPreferences prefs})
       : _prefs = prefs,
@@ -18,6 +20,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<LoadUser>(_onLoadUser);
     on<RefreshUser>(_onRefreshUser);
     on<SignOut>(_onSignOut);
+    on<UpdateUserRole>(_onUpdateUserRole);
   }
 
   Future<void> _onLoadUser(
@@ -32,6 +35,8 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       final cachedEmail = _prefs.getString(_userEmailKey);
       final cachedPhoto = _prefs.getString(_userPhotoKey);
       final cachedId = _prefs.getString(_userIdKey);
+      final cachedRole = _prefs.getString(_userRoleKey);
+      final role = UserRole.fromString(cachedRole);
 
       if (cachedId != null && cachedName != null) {
         emit(state.copyWith(
@@ -40,6 +45,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           email: cachedEmail,
           photoUrl: cachedPhoto,
           status: UserStatus.loaded,
+          role: role,
         ));
 
         // Try to refresh in background
@@ -154,10 +160,25 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       await _prefs.remove(_userNameKey);
       await _prefs.remove(_userEmailKey);
       await _prefs.remove(_userPhotoKey);
+      await _prefs.remove(_userRoleKey);
 
       emit(const UserState(
         status: UserStatus.unauthenticated,
       ));
+    } catch (e) {
+      emit(state.copyWith(
+        errorMessage: e.toString(),
+      ));
+    }
+  }
+
+  Future<void> _onUpdateUserRole(
+    UpdateUserRole event,
+    Emitter<UserState> emit,
+  ) async {
+    try {
+      await _prefs.setString(_userRoleKey, event.role.name);
+      emit(state.copyWith(role: event.role));
     } catch (e) {
       emit(state.copyWith(
         errorMessage: e.toString(),

@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../qr_scanner/qr_scanner_screen.dart';
+import '../checkin/user_qr_code_screen.dart';
 import '../workout/workout_list_screen.dart';
 import '../health/calorie_screen.dart';
 import '../challenges/challenges_screen.dart';
 import '../profile/profile_screen.dart';
+import '../receptionist/receptionist_scanner_screen.dart';
+import '../receptionist/checkins_list_screen.dart';
+import '../receptionist/member_search_screen.dart';
 import '../../../features/water_tracker/presentation/bloc/water_bloc.dart';
 import '../../../features/water_tracker/presentation/bloc/water_event.dart';
 import '../../../features/water_tracker/presentation/bloc/water_state.dart';
@@ -17,6 +20,10 @@ import '../../../features/gamification/presentation/bloc/badge_bloc.dart';
 import '../../../features/gamification/presentation/bloc/badge_event.dart';
 import '../../../features/gamification/presentation/bloc/badge_state.dart';
 import '../../../features/trainer_marketplace/presentation/pages/trainer_list_screen.dart';
+import '../../../features/ai_coach/presentation/pages/ai_coach_screen.dart';
+import '../../../features/user/presentation/bloc/user_bloc.dart';
+import '../../../features/user/presentation/bloc/user_state.dart';
+import '../../../features/user/domain/enums/user_role.dart';
 
 import 'widgets/home_header.dart';
 import 'widgets/today_stats_card.dart';
@@ -36,6 +43,7 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
   bool _isDarkMode = false;
   late AnimationController _fabController;
   late Animation<double> _fabAnimation;
+  UserRole? _previousRole;
 
   @override
   void initState() {
@@ -73,42 +81,70 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
     });
   }
 
+  List<Widget> _getMemberScreens() {
+    return [
+      _HomeContent(
+        isDarkMode: _isDarkMode,
+        onThemeToggle: _toggleTheme,
+        onRefresh: _loadData,
+      ),
+      const WorkoutListScreen(),
+      const CalorieScreen(),
+      const ChallengesScreen(),
+      const ProfileScreen(),
+    ];
+  }
+
+  List<Widget> _getReceptionistScreens() {
+    return [
+      const ReceptionistScannerScreen(),
+      const CheckinsListScreen(),
+      const MemberSearchScreen(),
+      const ProfileScreen(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: _isDarkMode
-          ? ThemeData.dark().copyWith(
-              primaryColor: const Color(0xFFFE7409),
-              scaffoldBackgroundColor: const Color(0xFF0D0D0D),
-            )
-          : ThemeData.light().copyWith(
-              primaryColor: const Color(0xFFFE7409),
-              scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, userState) {
+        final role = userState.role;
+
+        // Reset tab index when role changes
+        if (_previousRole != null && _previousRole != role) {
+          _currentIndex = 0;
+        }
+        _previousRole = role;
+
+        final isMember = role == UserRole.member;
+        final screens = isMember ? _getMemberScreens() : _getReceptionistScreens();
+
+        return Theme(
+          data: _isDarkMode
+              ? ThemeData.dark().copyWith(
+                  primaryColor: const Color(0xFFFE7409),
+                  scaffoldBackgroundColor: const Color(0xFF0D0D0D),
+                )
+              : ThemeData.light().copyWith(
+                  primaryColor: const Color(0xFFFE7409),
+                  scaffoldBackgroundColor: const Color(0xFFF5F5F5),
+                ),
+          child: Scaffold(
+            body: IndexedStack(
+              index: _currentIndex,
+              children: screens,
             ),
-      child: Scaffold(
-        body: IndexedStack(
-          index: _currentIndex,
-          children: [
-            _HomeContent(
-              isDarkMode: _isDarkMode,
-              onThemeToggle: _toggleTheme,
-              onRefresh: _loadData,
-            ),
-            const WorkoutListScreen(),
-            const CalorieScreen(),
-            const ChallengesScreen(),
-            const ProfileScreen(),
-          ],
-        ),
-        floatingActionButton: _currentIndex == 0
-            ? ScaleTransition(
-                scale: _fabAnimation,
-                child: _buildQRFab(),
-              )
-            : null,
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        bottomNavigationBar: _buildBottomNav(),
-      ),
+            floatingActionButton: isMember && _currentIndex == 0
+                ? ScaleTransition(
+                    scale: _fabAnimation,
+                    child: _buildQRFab(),
+                  )
+                : null,
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+            bottomNavigationBar: isMember ? _buildMemberBottomNav() : _buildReceptionistBottomNav(),
+          ),
+        );
+      },
     );
   }
 
@@ -132,17 +168,17 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
           HapticFeedback.mediumImpact();
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => const QRScannerScreen()),
+            MaterialPageRoute(builder: (_) => const UserQRCodeScreen()),
           );
         },
         backgroundColor: Colors.transparent,
         elevation: 0,
-        child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 28),
+        child: const Icon(Icons.qr_code_rounded, color: Colors.white, size: 28),
       ),
     );
   }
 
-  Widget _buildBottomNav() {
+  Widget _buildMemberBottomNav() {
     return Container(
       decoration: BoxDecoration(
         color: _isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
@@ -166,6 +202,36 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
               const SizedBox(width: 56), // Space for FAB
               _buildNavItem(3, Icons.emoji_events_rounded, Icons.emoji_events_outlined, 'Сорилт'),
               _buildNavItem(4, Icons.person_rounded, Icons.person_outline_rounded, 'Профайл'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReceptionistBottomNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: _isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, Icons.qr_code_scanner_rounded, Icons.qr_code_scanner_outlined, 'Скан'),
+              _buildNavItem(1, Icons.fact_check_rounded, Icons.fact_check_outlined, 'Check-ins'),
+              _buildNavItem(2, Icons.people_rounded, Icons.people_outlined, 'Гишүүд'),
+              _buildNavItem(3, Icons.person_rounded, Icons.person_outline_rounded, 'Профайл'),
             ],
           ),
         ),
@@ -274,10 +340,19 @@ class _HomeContent extends StatelessWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 20),
-              child: ActiveWorkoutCard(
-                isDarkMode: isDarkMode,
-                onContinue: () => _navigateToWorkout(context),
-                onStartNew: () => _navigateToWorkout(context),
+              child: BlocBuilder<StatisticsBloc, StatisticsState>(
+                builder: (context, statsState) {
+                  final stats = statsState.workoutStats;
+                  return ActiveWorkoutCard(
+                    isDarkMode: isDarkMode,
+                    onContinue: () => _navigateToWorkout(context),
+                    onStartNew: () => _navigateToWorkout(context),
+                    todayWorkouts: stats?.todayWorkouts ?? 0,
+                    currentStreak: stats?.currentStreak ?? 0,
+                    weeklyGoal: 5,
+                    weeklyCompleted: stats?.weeklyWorkouts.where((w) => w > 0).length ?? 0,
+                  );
+                },
               ),
             ),
           ),
@@ -316,58 +391,119 @@ class _HomeContent extends StatelessWidget {
             ),
           ),
 
-          // Quick Actions
+          // Quick Actions - Enhanced with progress & gamification
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.only(top: 24),
-              child: BlocBuilder<BadgeBloc, BadgeState>(
-                builder: (context, badgeState) {
-                  return QuickActionsSection(
-                    isDarkMode: isDarkMode,
-                    actions: [
-                      QuickAction(
-                        title: 'Ус',
-                        icon: Icons.water_drop_rounded,
-                        color: const Color(0xFF3498DB),
-                        onTap: () => _quickAddWater(context),
-                      ),
-                      QuickAction(
-                        title: 'Дасгал',
-                        icon: Icons.fitness_center_rounded,
-                        color: const Color(0xFF9B59B6),
-                        onTap: () => _navigateToWorkout(context),
-                      ),
-                      QuickAction(
-                        title: 'Шагнал',
-                        icon: Icons.emoji_events_rounded,
-                        color: const Color(0xFFF39C12),
-                        onTap: () => Navigator.pushNamed(context, '/badges'),
-                        badge: badgeState.newBadgeCount > 0
-                            ? '${badgeState.newBadgeCount}'
-                            : null,
-                      ),
-                      QuickAction(
-                        title: 'Дасгалжуулагч',
-                        icon: Icons.person_search_rounded,
-                        color: const Color(0xFF1ABC9C),
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const TrainerListScreen()),
-                        ),
-                      ),
-                      QuickAction(
-                        title: 'Дэлгүүр',
-                        icon: Icons.shopping_bag_rounded,
-                        color: const Color(0xFFE74C3C),
-                        onTap: () => Navigator.pushNamed(context, '/shop'),
-                      ),
-                      QuickAction(
-                        title: 'Статистик',
-                        icon: Icons.analytics_rounded,
-                        color: const Color(0xFF6C5CE7),
-                        onTap: () => Navigator.pushNamed(context, '/statistics'),
-                      ),
-                    ],
+              child: BlocBuilder<WaterBloc, WaterState>(
+                builder: (context, waterState) {
+                  return BlocBuilder<StatisticsBloc, StatisticsState>(
+                    builder: (context, statsState) {
+                      return BlocBuilder<BadgeBloc, BadgeState>(
+                        builder: (context, badgeState) {
+                          // Calculate progress values
+                          final waterMl = waterState.dailySummary?.totalMl ?? 0;
+                          final waterGoal = waterState.dailySummary?.goalMl ?? 2500;
+                          final waterProgress = (waterMl / waterGoal).clamp(0.0, 1.0);
+
+                          final todayWorkouts = statsState.todayWorkouts;
+                          final currentStreak = statsState.workoutStats?.currentStreak ?? 0;
+
+                          // Determine priorities based on context
+                          final waterPriority = QuickActionContextHelper.getWaterPriority(waterMl, waterGoal);
+                          final workoutPriority = QuickActionContextHelper.getWorkoutPriority(todayWorkouts, currentStreak);
+
+                          return QuickActionsSection(
+                            isDarkMode: isDarkMode,
+                            contextMessage: QuickActionContextHelper.getContextMessage(),
+                            actions: [
+                              QuickAction(
+                                id: 'ai_coach',
+                                title: 'AI Coach',
+                                icon: Icons.smart_toy_rounded,
+                                color: const Color(0xFFFF6B6B),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const AICoachScreen()),
+                                ),
+                                xpReward: 15,
+                                priority: ActionPriority.high,
+                                badge: 'Шинэ',
+                              ),
+                              QuickAction(
+                                id: 'checkin',
+                                title: 'Check-In',
+                                icon: Icons.qr_code_rounded,
+                                color: const Color(0xFFFE7409),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const UserQRCodeScreen()),
+                                ),
+                                xpReward: 10,
+                                priority: ActionPriority.high,
+                              ),
+                              QuickAction(
+                                id: 'water',
+                                title: 'Ус',
+                                icon: Icons.water_drop_rounded,
+                                color: const Color(0xFF3498DB),
+                                onTap: () => _quickAddWater(context),
+                                progress: waterProgress,
+                                progressLabel: '${(waterMl / 1000).toStringAsFixed(1)}L',
+                                xpReward: 5,
+                                priority: waterPriority,
+                              ),
+                              QuickAction(
+                                id: 'workout',
+                                title: 'Дасгал',
+                                icon: Icons.fitness_center_rounded,
+                                color: const Color(0xFF9B59B6),
+                                onTap: () => _navigateToWorkout(context),
+                                progress: todayWorkouts > 0 ? 1.0 : 0.0,
+                                progressLabel: todayWorkouts > 0 ? 'Хийсэн' : 'Эхлэх',
+                                xpReward: 25,
+                                hasStreak: currentStreak > 0,
+                                priority: workoutPriority,
+                              ),
+                              QuickAction(
+                                id: 'badges',
+                                title: 'Шагнал',
+                                icon: Icons.emoji_events_rounded,
+                                color: const Color(0xFFF39C12),
+                                onTap: () => Navigator.pushNamed(context, '/badges'),
+                                badge: badgeState.newBadgeCount > 0
+                                    ? '${badgeState.newBadgeCount}'
+                                    : null,
+                                xpReward: badgeState.newBadgeCount > 0 ? 50 : null,
+                                isBonus: badgeState.newBadgeCount > 0,
+                                priority: badgeState.newBadgeCount > 0
+                                    ? ActionPriority.high
+                                    : ActionPriority.normal,
+                              ),
+                              QuickAction(
+                                id: 'trainer',
+                                title: 'Дасгалжуулагч',
+                                icon: Icons.person_search_rounded,
+                                color: const Color(0xFF1ABC9C),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const TrainerListScreen()),
+                                ),
+                                priority: ActionPriority.normal,
+                              ),
+                              QuickAction(
+                                id: 'statistics',
+                                title: 'Статистик',
+                                icon: Icons.analytics_rounded,
+                                color: const Color(0xFF6C5CE7),
+                                onTap: () => Navigator.pushNamed(context, '/statistics'),
+                                priority: ActionPriority.normal,
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   );
                 },
               ),

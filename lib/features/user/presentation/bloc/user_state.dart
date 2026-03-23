@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import '../../domain/enums/user_role.dart';
 
 enum UserStatus { initial, loading, loaded, error, unauthenticated }
 
@@ -9,6 +10,7 @@ class UserState extends Equatable {
   final String? photoUrl;
   final UserStatus status;
   final String? errorMessage;
+  final UserRole role;
 
   const UserState({
     this.userId,
@@ -17,6 +19,7 @@ class UserState extends Equatable {
     this.photoUrl,
     this.status = UserStatus.initial,
     this.errorMessage,
+    this.role = UserRole.member,
   });
 
   bool get isAuthenticated => status == UserStatus.loaded && userId != null;
@@ -39,6 +42,7 @@ class UserState extends Equatable {
     String? photoUrl,
     UserStatus? status,
     String? errorMessage,
+    UserRole? role,
   }) {
     return UserState(
       userId: userId ?? this.userId,
@@ -47,6 +51,7 @@ class UserState extends Equatable {
       photoUrl: photoUrl ?? this.photoUrl,
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
+      role: role ?? this.role,
     );
   }
 
@@ -58,5 +63,6 @@ class UserState extends Equatable {
         photoUrl,
         status,
         errorMessage,
+        role,
       ];
 }
