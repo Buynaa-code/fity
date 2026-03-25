@@ -6,7 +6,7 @@ class ProductCard extends StatelessWidget {
   final VoidCallback onTap;
   final VoidCallback onAddToCart;
 
-  static const Color primaryColor = Color(0xFFFE7409);
+  static const Color primaryColor = Color(0xFFF72928);
 
   const ProductCard({
     super.key,

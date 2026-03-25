@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/branding/brand_config.dart';
 import '../../bloc/cart_bloc.dart';
 import '../../bloc/cart_event.dart';
 import '../../bloc/cart_state.dart';
@@ -20,8 +22,6 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen>
     with SingleTickerProviderStateMixin {
-  static const Color primaryColor = Color(0xFFFE7409);
-
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
 
@@ -83,30 +83,74 @@ class _CartScreenState extends State<CartScreen>
     );
   }
 
+  void _showUndoSnackbar(CartItem removedItem) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${removedItem.product.name} устгагдлаа'),
+        action: SnackBarAction(
+          label: 'Буцаах',
+          textColor: BrandColors.primary,
+          onPressed: () {
+            widget.cartBloc.add(const CartItemUndoRemoved());
+          },
+        ),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: BrandColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            children: [
-              _buildHeader(),
-              Expanded(
-                child: ListenableBuilder(
-                  listenable: widget.cartBloc,
-                  builder: (context, _) {
-                    final state = widget.cartBloc.state;
-                    if (state.isEmpty) {
-                      return _buildEmptyCart();
-                    }
-                    return _buildCartItems(state);
-                  },
-                ),
+    return BlocProvider.value(
+      value: widget.cartBloc,
+      child: BlocListener<CartBloc, CartState>(
+        listener: (context, state) {
+          // Show undo snackbar when item is removed
+          if (state.lastRemovedItem != null) {
+            _showUndoSnackbar(state.lastRemovedItem!);
+          }
+          // Show error snackbar
+          if (state.status == CartStatus.error && state.errorMessage != null) {
+            _showErrorSnackbar(state.errorMessage!);
+          }
+        },
+        child: Scaffold(
+          backgroundColor: BrandColors.background,
+          body: SafeArea(
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: Column(
+                children: [
+                  _buildHeader(),
+                  Expanded(
+                    child: BlocBuilder<CartBloc, CartState>(
+                      builder: (context, state) {
+                        if (state.isEmpty) {
+                          return _buildEmptyCart();
+                        }
+                        return _buildCartItems(state);
+                      },
+                    ),
+                  ),
+                  _buildBottomBar(),
+                ],
               ),
-              _buildBottomBar(),
-            ],
+            ),
           ),
         ),
       ),
@@ -123,25 +167,17 @@ class _CartScreenState extends State<CartScreen>
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: BrandColors.surface,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                boxShadow: BrandShadows.small,
               ),
               child: const Icon(Icons.arrow_back_ios_new, size: 20),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: ListenableBuilder(
-              listenable: widget.cartBloc,
-              builder: (context, _) {
-                final itemCount = widget.cartBloc.state.itemCount;
+            child: BlocBuilder<CartBloc, CartState>(
+              builder: (context, state) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -153,10 +189,10 @@ class _CartScreenState extends State<CartScreen>
                       ),
                     ),
                     Text(
-                      '$itemCount бүтээгдэхүүн',
-                      style: const TextStyle(
+                      '${state.itemCount} бүтээгдэхүүн',
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey,
+                        color: BrandColors.textSecondary,
                       ),
                     ),
                   ],
@@ -164,21 +200,47 @@ class _CartScreenState extends State<CartScreen>
               },
             ),
           ),
-          ListenableBuilder(
-            listenable: widget.cartBloc,
-            builder: (context, _) {
-              if (widget.cartBloc.state.isEmpty) return const SizedBox();
+          // Continue shopping button
+          GestureDetector(
+            onTap: () => Navigator.pop(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: BrandColors.primarySurface,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, size: 16, color: BrandColors.primary),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Нэмэх',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: BrandColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          BlocBuilder<CartBloc, CartState>(
+            builder: (context, state) {
+              if (state.isEmpty) return const SizedBox();
               return GestureDetector(
                 onTap: _clearCart,
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.1),
+                    color: BrandColors.errorSurface,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.delete_outline,
-                    color: Colors.red,
+                    color: BrandColors.error,
                     size: 22,
                   ),
                 ),
@@ -198,13 +260,13 @@ class _CartScreenState extends State<CartScreen>
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
+              color: BrandColors.primarySurface,
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.shopping_cart_outlined,
               size: 64,
-              color: primaryColor.withOpacity(0.5),
+              color: BrandColors.primary.withOpacity(0.5),
             ),
           ),
           const SizedBox(height: 24),
@@ -220,15 +282,17 @@ class _CartScreenState extends State<CartScreen>
             'Бүтээгдэхүүн нэмж эхлээрэй',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.grey[600],
+              color: BrandColors.textSecondary,
             ),
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.shopping_bag_outlined),
+            label: const Text('Дэлгүүр рүү буцах'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: primaryColor,
-              foregroundColor: Colors.white,
+              backgroundColor: BrandColors.primary,
+              foregroundColor: BrandColors.textOnPrimary,
               padding: const EdgeInsets.symmetric(
                 horizontal: 32,
                 vertical: 14,
@@ -237,7 +301,6 @@ class _CartScreenState extends State<CartScreen>
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            child: const Text('Дэлгүүр рүү буцах'),
           ),
         ],
       ),
@@ -256,10 +319,20 @@ class _CartScreenState extends State<CartScreen>
             widget.cartBloc.add(CartItemIncremented(productId: item.product.id));
           },
           onDecrement: () {
-            widget.cartBloc.add(CartItemDecremented(productId: item.product.id));
+            if (item.quantity > 1) {
+              widget.cartBloc.add(CartItemDecremented(productId: item.product.id));
+            } else {
+              widget.cartBloc.add(CartItemRemoved(productId: item.product.id));
+            }
           },
           onRemove: () {
             widget.cartBloc.add(CartItemRemoved(productId: item.product.id));
+          },
+          onQuantityChanged: (quantity) {
+            widget.cartBloc.add(CartItemQuantityUpdated(
+              productId: item.product.id,
+              quantity: quantity,
+            ));
           },
         );
       },
@@ -267,10 +340,8 @@ class _CartScreenState extends State<CartScreen>
   }
 
   Widget _buildBottomBar() {
-    return ListenableBuilder(
-      listenable: widget.cartBloc,
-      builder: (context, _) {
-        final state = widget.cartBloc.state;
+    return BlocBuilder<CartBloc, CartState>(
+      builder: (context, state) {
         if (state.isEmpty) return const SizedBox();
 
         return Container(
@@ -281,7 +352,7 @@ class _CartScreenState extends State<CartScreen>
             16 + MediaQuery.of(context).padding.bottom,
           ),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: BrandColors.surface,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.05),
@@ -293,10 +364,42 @@ class _CartScreenState extends State<CartScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Estimated delivery
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: BrandColors.successSurface,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.local_shipping_outlined,
+                      size: 18, color: BrandColors.success),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Хүргэлт: 1-3 өдөр',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: BrandColors.success,
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      'Үнэгүй',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: BrandColors.success,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
               _buildSummaryRow('Нийт бүтээгдэхүүн', '${state.itemCount} ширхэг'),
               const SizedBox(height: 8),
-              _buildSummaryRow('Хүргэлт', 'Үнэгүй', isHighlighted: true),
-              const Divider(height: 24),
+              const Divider(height: 16),
               _buildSummaryRow(
                 'Нийт дүн',
                 state.formattedTotalPrice,
@@ -308,8 +411,8 @@ class _CartScreenState extends State<CartScreen>
                 child: ElevatedButton(
                   onPressed: _proceedToCheckout,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
+                    backgroundColor: BrandColors.primary,
+                    foregroundColor: BrandColors.textOnPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -349,7 +452,7 @@ class _CartScreenState extends State<CartScreen>
           style: TextStyle(
             fontSize: isBold ? 16 : 14,
             fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-            color: isBold ? Colors.black : Colors.grey[600],
+            color: isBold ? BrandColors.textPrimary : BrandColors.textSecondary,
           ),
         ),
         Text(
@@ -358,10 +461,10 @@ class _CartScreenState extends State<CartScreen>
             fontSize: isBold ? 18 : 14,
             fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
             color: isBold
-                ? primaryColor
+                ? BrandColors.primary
                 : isHighlighted
-                    ? Colors.green
-                    : Colors.black,
+                    ? BrandColors.success
+                    : BrandColors.textPrimary,
           ),
         ),
       ],
@@ -374,14 +477,14 @@ class _CartItemCard extends StatelessWidget {
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
   final VoidCallback onRemove;
-
-  static const Color primaryColor = Color(0xFFFE7409);
+  final Function(int) onQuantityChanged;
 
   const _CartItemCard({
     required this.item,
     required this.onIncrement,
     required this.onDecrement,
     required this.onRemove,
+    required this.onQuantityChanged,
   });
 
   @override
@@ -389,34 +492,34 @@ class _CartItemCard extends StatelessWidget {
     return Dismissible(
       key: Key(item.product.id),
       direction: DismissDirection.endToStart,
-      onDismissed: (_) => onRemove(),
+      confirmDismiss: (direction) async {
+        onRemove();
+        return false; // Don't dismiss, let bloc handle it for undo
+      },
       background: Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.only(right: 20),
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.red,
+          color: BrandColors.error,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Icon(
-          Icons.delete_outline,
-          color: Colors.white,
-          size: 28,
+        child: const Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.delete_outline, color: Colors.white, size: 28),
+            SizedBox(height: 4),
+            Text('Устгах', style: TextStyle(color: Colors.white, fontSize: 12)),
+          ],
         ),
       ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: BrandColors.surface,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: BrandShadows.small,
         ),
         child: Row(
           children: [
@@ -431,25 +534,50 @@ class _CartItemCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: SizedBox(
-        width: 80,
-        height: 80,
-        child: Image.network(
-          item.product.image,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Container(
-              color: Colors.grey[200],
-              child: Icon(
-                Icons.image_not_supported_outlined,
-                color: Colors.grey[400],
-              ),
-            );
-          },
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: SizedBox(
+            width: 80,
+            height: 80,
+            child: Image.network(
+              item.product.image,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: BrandColors.surfaceVariant,
+                  child: Icon(
+                    Icons.image_not_supported_outlined,
+                    color: BrandColors.disabled,
+                  ),
+                );
+              },
+            ),
+          ),
         ),
-      ),
+        // Stock warning badge
+        if (item.quantity >= item.product.stockQuantity)
+          Positioned(
+            top: 4,
+            right: 4,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              decoration: BoxDecoration(
+                color: BrandColors.warning,
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: const Text(
+                'MAX',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 8,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -467,21 +595,42 @@ class _CartItemCard extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        Text(
-          item.product.category.displayName,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          decoration: BoxDecoration(
+            color: BrandColors.surfaceVariant,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Text(
+            item.product.category.displayName,
+            style: TextStyle(
+              fontSize: 11,
+              color: BrandColors.textSecondary,
+            ),
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          item.formattedTotalPrice,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: primaryColor,
-          ),
+        Row(
+          children: [
+            Text(
+              item.formattedTotalPrice,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: BrandColors.primary,
+              ),
+            ),
+            if (item.quantity > 1) ...[
+              const SizedBox(width: 8),
+              Text(
+                '(₮${item.product.price.toStringAsFixed(0)} x ${item.quantity})',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: BrandColors.textTertiary,
+                ),
+              ),
+            ],
+          ],
         ),
       ],
     );
@@ -490,6 +639,7 @@ class _CartItemCard extends StatelessWidget {
   Widget _buildQuantityControls() {
     return Column(
       children: [
+        // Remove button
         GestureDetector(
           onTap: onRemove,
           child: Container(
@@ -497,46 +647,73 @@ class _CartItemCard extends StatelessWidget {
             child: Icon(
               Icons.close,
               size: 18,
-              color: Colors.grey[400],
+              color: BrandColors.textTertiary,
             ),
           ),
         ),
         const SizedBox(height: 8),
+        // Horizontal quantity controls (improved UX)
         Container(
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: BrandColors.surfaceVariant,
             borderRadius: BorderRadius.circular(8),
           ),
-          child: Column(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              GestureDetector(
-                onTap: onIncrement,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  child: const Icon(Icons.add, size: 18),
-                ),
+              _QuantityButton(
+                icon: Icons.remove,
+                onTap: onDecrement,
+                isEnabled: true,
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                constraints: const BoxConstraints(minWidth: 36),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
                 child: Text(
                   item.quantity.toString(),
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: onDecrement,
-                child: Container(
-                  padding: const EdgeInsets.all(6),
-                  child: const Icon(Icons.remove, size: 18),
-                ),
+              _QuantityButton(
+                icon: Icons.add,
+                onTap: onIncrement,
+                isEnabled: item.quantity < item.product.stockQuantity,
               ),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _QuantityButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  final bool isEnabled;
+
+  const _QuantityButton({
+    required this.icon,
+    required this.onTap,
+    required this.isEnabled,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: isEnabled ? onTap : null,
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        child: Icon(
+          icon,
+          size: 18,
+          color: isEnabled ? BrandColors.textPrimary : BrandColors.disabled,
+        ),
+      ),
     );
   }
 }

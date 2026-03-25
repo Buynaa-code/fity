@@ -47,7 +47,7 @@ class QuickQuestionChips extends StatelessWidget {
                     Icon(
                       _getQuestionIcon(questions[index]),
                       size: 14,
-                      color: const Color(0xFFFE7409),
+                      color: const Color(0xFFF72928),
                     ),
                     const SizedBox(width: 6),
                     Text(

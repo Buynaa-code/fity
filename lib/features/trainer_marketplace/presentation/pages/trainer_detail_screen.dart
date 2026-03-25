@@ -53,7 +53,7 @@ class _TrainerDetailView extends StatelessWidget {
           builder: (context, state) {
             if (state is TrainerDetailLoading) {
               return const Center(
-                child: CircularProgressIndicator(color: Color(0xFFFE7409)),
+                child: CircularProgressIndicator(color: Color(0xFFF72928)),
               );
             }
 
@@ -128,11 +128,11 @@ class _TrainerDetailView extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
-                  color: const Color(0xFFFE7409).withOpacity(0.2),
+                  color: const Color(0xFFF72928).withOpacity(0.2),
                   child: const Icon(
                     Icons.person,
                     size: 100,
-                    color: Color(0xFFFE7409),
+                    color: Color(0xFFF72928),
                   ),
                 );
               },
@@ -228,7 +228,7 @@ class _TrainerDetailView extends StatelessWidget {
   Widget _buildInfoItem(IconData icon, String value, String label) {
     return Column(
       children: [
-        Icon(icon, color: const Color(0xFFFE7409), size: 28),
+        Icon(icon, color: const Color(0xFFF72928), size: 28),
         const SizedBox(height: 8),
         Text(
           value,
@@ -271,13 +271,13 @@ class _TrainerDetailView extends StatelessWidget {
               return Container(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFE7409).withOpacity(0.1),
+                  color: const Color(0xFFF72928).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
                   specialty,
                   style: const TextStyle(
-                    color: Color(0xFFFE7409),
+                    color: Color(0xFFF72928),
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -365,7 +365,7 @@ class _TrainerDetailView extends StatelessWidget {
                 children: [
                   const Icon(
                     Icons.verified_rounded,
-                    color: Color(0xFFFE7409),
+                    color: Color(0xFFF72928),
                     size: 20,
                   ),
                   const SizedBox(width: 12),
@@ -422,11 +422,11 @@ class _TrainerDetailView extends StatelessWidget {
                     width: 60,
                     margin: const EdgeInsets.only(right: 12),
                     decoration: BoxDecoration(
-                      color: isSelected ? const Color(0xFFFE7409) : Colors.white,
+                      color: isSelected ? const Color(0xFFF72928) : Colors.white,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
                         color: isSelected
-                            ? const Color(0xFFFE7409)
+                            ? const Color(0xFFF72928)
                             : Colors.grey[300]!,
                       ),
                     ),
@@ -512,14 +512,14 @@ class _TrainerDetailView extends StatelessWidget {
                         ),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? const Color(0xFFFE7409)
+                              ? const Color(0xFFF72928)
                               : isAvailable
                                   ? Colors.white
                                   : Colors.grey[200],
                           borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: isSelected
-                                ? const Color(0xFFFE7409)
+                                ? const Color(0xFFF72928)
                                 : isAvailable
                                     ? Colors.grey[300]!
                                     : Colors.grey[300]!,
@@ -595,11 +595,11 @@ class _TrainerDetailView extends StatelessWidget {
                       CircleAvatar(
                         radius: 18,
                         backgroundColor:
-                            const Color(0xFFFE7409).withOpacity(0.1),
+                            const Color(0xFFF72928).withOpacity(0.1),
                         child: Text(
                           review.userName[0],
                           style: const TextStyle(
-                            color: Color(0xFFFE7409),
+                            color: Color(0xFFF72928),
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -683,7 +683,7 @@ class _TrainerDetailView extends StatelessWidget {
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFFE7409),
+                          color: Color(0xFFF72928),
                         ),
                       ),
                     ],
@@ -701,7 +701,7 @@ class _TrainerDetailView extends StatelessWidget {
                                 ));
                           },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFE7409),
+                      backgroundColor: const Color(0xFFF72928),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -784,7 +784,7 @@ class _TrainerDetailView extends StatelessWidget {
                     Navigator.of(context).pop();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFFE7409),
+                    backgroundColor: const Color(0xFFF72928),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(

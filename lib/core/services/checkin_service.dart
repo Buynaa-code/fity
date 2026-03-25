@@ -214,6 +214,23 @@ class CheckInService {
     return CheckInRecord.fromJson(jsonDecode(data));
   }
 
+  /// Get active check-in by user ID (to prevent duplicate check-ins)
+  Future<CheckInRecord?> getActiveCheckInByUserId(String userId) async {
+    final history = await getCheckInHistory();
+    final today = DateTime.now();
+    final todayStart = DateTime(today.year, today.month, today.day);
+
+    // Find active check-in for this user from today
+    for (final record in history) {
+      if (record.oderId == userId &&
+          record.isActive &&
+          record.checkInTime.isAfter(todayStart)) {
+        return record;
+      }
+    }
+    return null;
+  }
+
   /// Check in to gym
   Future<CheckInRecord> checkIn(
     String oderId, {
@@ -254,7 +271,7 @@ class CheckInService {
     return record;
   }
 
-  /// Check out from gym
+  /// Check out from gym (current user's active session)
   Future<CheckInRecord?> checkOut() async {
     final prefs = await SharedPreferences.getInstance();
     final active = await getActiveCheckIn();
@@ -282,6 +299,36 @@ class CheckInService {
     return updatedRecord;
   }
 
+  /// Check out by record ID (for receptionist use)
+  Future<CheckInRecord?> checkOutById(String recordId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final history = await getCheckInHistory();
+
+    final index = history.indexWhere((r) => r.id == recordId);
+    if (index == -1) return null;
+
+    final record = history[index];
+    if (!record.isActive) return null; // Already checked out
+
+    final updatedRecord = record.copyWith(
+      checkOutTime: DateTime.now(),
+    );
+
+    history[index] = updatedRecord;
+    await prefs.setString(
+      _checkInsKey,
+      jsonEncode(history.map((r) => r.toJson()).toList()),
+    );
+
+    // Also clear active check-in if this was the active one
+    final active = await getActiveCheckIn();
+    if (active?.id == recordId) {
+      await prefs.remove(_activeCheckInKey);
+    }
+
+    return updatedRecord;
+  }
+
   /// Calculate check-in statistics
   Future<CheckInStats> getCheckInStats() async {
     final history = await getCheckInHistory();
@@ -291,14 +338,11 @@ class CheckInService {
     }
 
     final now = DateTime.now();
-    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+    final startOfWeek = DateTime(today.year, today.month, today.day)
+        .subtract(Duration(days: today.weekday - 1));
     final startOfMonth = DateTime(now.year, now.month, 1);
-
-    // Calculate streak
-    int currentStreak = 0;
-    int bestStreak = 0;
-    int tempStreak = 0;
-    DateTime? lastDate;
 
     // Get unique check-in days
     final uniqueDays = <DateTime>{};
@@ -310,33 +354,51 @@ class CheckInService {
       ));
     }
 
-    // Sort days descending
+    // Sort days descending (newest first)
     final sortedDays = uniqueDays.toList()..sort((a, b) => b.compareTo(a));
 
-    for (final day in sortedDays) {
-      if (lastDate == null) {
-        tempStreak = 1;
-        final today = DateTime(now.year, now.month, now.day);
-        final yesterday = today.subtract(const Duration(days: 1));
+    // Calculate current streak
+    int currentStreak = 0;
+    int bestStreak = 0;
 
-        if (day == today || day == yesterday) {
-          currentStreak = 1;
-        }
-      } else {
-        final diff = lastDate.difference(day).inDays;
-        if (diff == 1) {
-          tempStreak++;
-          if (currentStreak > 0) currentStreak++;
-        } else if (diff > 1) {
-          if (tempStreak > bestStreak) bestStreak = tempStreak;
-          tempStreak = 1;
-          currentStreak = 0;
+    if (sortedDays.isNotEmpty) {
+      // Check if the most recent check-in was today or yesterday
+      final mostRecentDay = sortedDays.first;
+
+      if (mostRecentDay == today || mostRecentDay == yesterday) {
+        // Start counting the streak from the most recent day
+        currentStreak = 1;
+        DateTime expectedDay = mostRecentDay.subtract(const Duration(days: 1));
+
+        for (int i = 1; i < sortedDays.length; i++) {
+          if (sortedDays[i] == expectedDay) {
+            currentStreak++;
+            expectedDay = expectedDay.subtract(const Duration(days: 1));
+          } else if (sortedDays[i].isBefore(expectedDay)) {
+            // Gap found, streak broken
+            break;
+          }
+          // Skip duplicate days (same day)
         }
       }
 
-      lastDate = day;
+      // Calculate best streak
+      int tempStreak = 1;
+      for (int i = 1; i < sortedDays.length; i++) {
+        final diff = sortedDays[i - 1].difference(sortedDays[i]).inDays;
+        if (diff == 1) {
+          tempStreak++;
+        } else if (diff > 1) {
+          if (tempStreak > bestStreak) bestStreak = tempStreak;
+          tempStreak = 1;
+        }
+        // diff == 0 means same day, skip
+      }
+      if (tempStreak > bestStreak) bestStreak = tempStreak;
     }
-    if (tempStreak > bestStreak) bestStreak = tempStreak;
+
+    // Ensure bestStreak is at least as high as currentStreak
+    if (currentStreak > bestStreak) bestStreak = currentStreak;
 
     // Calculate durations
     Duration totalDuration = Duration.zero;

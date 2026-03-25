@@ -37,16 +37,23 @@ class WeeklyWaterChart extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final maxY = weeklySummary.fold<double>(
+    // Calculate maxY from both goalMl and totalMl to prevent bars from overflowing
+    final maxGoal = weeklySummary.fold<double>(
       2000,
       (max, s) => s.goalMl > max ? s.goalMl.toDouble() : max,
     );
+    final maxTotal = weeklySummary.fold<double>(
+      0,
+      (max, s) => s.totalMl > max ? s.totalMl.toDouble() : max,
+    );
+    final maxY = maxGoal > maxTotal ? maxGoal : maxTotal;
 
     final streak = _streakCount;
     final goalsReached = _goalsReachedThisWeek;
 
     return Container(
       padding: const EdgeInsets.all(20),
+      clipBehavior: Clip.hardEdge,
       decoration: BoxDecoration(
         color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(20),

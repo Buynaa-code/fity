@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/branding/brand_config.dart';
 import '../../bloc/cart_bloc.dart';
 import '../../bloc/cart_event.dart';
+import '../../bloc/cart_state.dart';
 import '../../domain/entities/product.dart';
 import 'cart_screen.dart';
 
@@ -20,8 +23,6 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen>
     with SingleTickerProviderStateMixin {
-  static const Color primaryColor = Color(0xFFFE7409);
-
   int _quantity = 1;
   late final AnimationController _animationController;
   late final Animation<double> _fadeAnimation;
@@ -61,7 +62,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${widget.product.name} ($_quantity ширхэг) сагсанд нэмэгдлээ'),
-        backgroundColor: primaryColor,
+        backgroundColor: BrandColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         action: SnackBarAction(
@@ -138,10 +139,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
       actions: [
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: ListenableBuilder(
-            listenable: widget.cartBloc,
-            builder: (context, _) {
-              final itemCount = widget.cartBloc.state.itemCount;
+          child: BlocBuilder<CartBloc, CartState>(
+            bloc: widget.cartBloc,
+            builder: (context, state) {
+              final itemCount = state.itemCount;
               return GestureDetector(
                 onTap: _openCart,
                 child: Container(
@@ -167,7 +168,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: const BoxDecoration(
-                              color: primaryColor,
+                              color: BrandColors.primary,
                               shape: BoxShape.circle,
                             ),
                             constraints: const BoxConstraints(
@@ -242,7 +243,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: primaryColor.withOpacity(0.1),
+        color: BrandColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -253,7 +254,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           Text(
             widget.product.category.displayName,
             style: const TextStyle(
-              color: primaryColor,
+              color: BrandColors.primary,
               fontWeight: FontWeight.w600,
               fontSize: 13,
             ),
@@ -313,7 +314,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
           style: const TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,
-            color: primaryColor,
+            color: BrandColors.primary,
           ),
         ),
         const Spacer(),
@@ -500,7 +501,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: primaryColor,
+                    color: BrandColors.primary,
                   ),
                 ),
               ],
@@ -512,7 +513,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen>
             child: ElevatedButton(
               onPressed: widget.product.inStock ? _addToCart : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
+                backgroundColor: BrandColors.primary,
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: Colors.grey[300],
                 padding: const EdgeInsets.symmetric(vertical: 16),

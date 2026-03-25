@@ -95,7 +95,7 @@ class _BadgesScreenState extends State<BadgesScreen>
       expandedHeight: 120,
       floating: false,
       pinned: true,
-      backgroundColor: const Color(0xFFFE7409),
+      backgroundColor: const Color(0xFFF72928),
       automaticallyImplyLeading: false,
       flexibleSpace: FlexibleSpaceBar(
         title: const Text(
@@ -108,7 +108,7 @@ class _BadgesScreenState extends State<BadgesScreen>
         background: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+              colors: [Color(0xFFF72928), Color(0xFFFF9149)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -354,7 +354,7 @@ class _BadgesScreenState extends State<BadgesScreen>
                 _showEarnedOnly = value;
               });
             },
-            activeThumbColor: const Color(0xFFFE7409),
+            activeThumbColor: const Color(0xFFF72928),
           ),
         ],
       ),
@@ -365,9 +365,9 @@ class _BadgesScreenState extends State<BadgesScreen>
     return TabBar(
       controller: _tabController,
       isScrollable: true,
-      labelColor: const Color(0xFFFE7409),
+      labelColor: const Color(0xFFF72928),
       unselectedLabelColor: Colors.grey,
-      indicatorColor: const Color(0xFFFE7409),
+      indicatorColor: const Color(0xFFF72928),
       labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
       tabs: _categories.map((category) {
         return Tab(text: _getCategoryName(category));

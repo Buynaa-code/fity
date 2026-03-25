@@ -318,12 +318,12 @@ class _AICoachScreenState extends State<AICoachScreen>
                 height: 48,
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+                    colors: [Color(0xFFF72928), Color(0xFFFF9149)],
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFE7409).withValues(
+                      color: const Color(0xFFF72928).withValues(
                         alpha: 0.3 + (_pulseController.value * 0.2),
                       ),
                       blurRadius: 12 + (_pulseController.value * 4),
@@ -515,7 +515,7 @@ class _AICoachScreenState extends State<AICoachScreen>
                         width: 8,
                         height: 8,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFE7409),
+                          color: const Color(0xFFF72928),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -591,12 +591,12 @@ class _AICoachScreenState extends State<AICoachScreen>
                   height: 50,
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+                      colors: [Color(0xFFF72928), Color(0xFFFF9149)],
                     ),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFFE7409).withValues(alpha: 0.4),
+                        color: const Color(0xFFF72928).withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -681,7 +681,7 @@ class _AICoachScreenState extends State<AICoachScreen>
                     height: 80,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+                        colors: [Color(0xFFF72928), Color(0xFFFF9149)],
                       ),
                       borderRadius: BorderRadius.circular(24),
                     ),
@@ -731,12 +731,12 @@ class _AICoachScreenState extends State<AICoachScreen>
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFFFE7409).withValues(alpha: 0.1),
+              color: const Color(0xFFF72928).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: const Color(0xFFFE7409),
+              color: const Color(0xFFF72928),
               size: 20,
             ),
           ),

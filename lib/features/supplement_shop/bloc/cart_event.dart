@@ -73,12 +73,19 @@ class CartCleared extends CartEvent {
 class CartCheckoutRequested extends CartEvent {
   final ShippingAddress shippingAddress;
   final String? notes;
+  final String paymentMethod;
 
   const CartCheckoutRequested({
     required this.shippingAddress,
     this.notes,
+    this.paymentMethod = 'cash',
   });
 
   @override
-  List<Object?> get props => [shippingAddress, notes];
+  List<Object?> get props => [shippingAddress, notes, paymentMethod];
+}
+
+/// Undo last removed item
+class CartItemUndoRemoved extends CartEvent {
+  const CartItemUndoRemoved();
 }

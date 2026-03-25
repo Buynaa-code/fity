@@ -256,10 +256,21 @@ class _EnhancedQuickActionItemState extends State<_EnhancedQuickActionItem>
                       ),
                     ),
                     if (action.hasStreak)
-                      const Positioned(
+                      Positioned(
                         top: -2,
                         right: -2,
-                        child: Text('🔥', style: TextStyle(fontSize: 12)),
+                        child: Container(
+                          padding: const EdgeInsets.all(2),
+                          decoration: BoxDecoration(
+                            color: AppColors.streak,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.local_fire_department_rounded,
+                            size: 10,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                   ],
                 ),

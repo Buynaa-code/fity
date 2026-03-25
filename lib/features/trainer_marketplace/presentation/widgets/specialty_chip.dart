@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/branding/brand_config.dart';
 
 class SpecialtyChip extends StatelessWidget {
   final String label;
@@ -17,21 +18,22 @@ class SpecialtyChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
+        duration: BrandAnimations.fast,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFFE7409) : Colors.white,
+          color: isSelected ? BrandColors.primary : BrandColors.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? const Color(0xFFFE7409) : Colors.grey[300]!,
+            color: isSelected ? BrandColors.primary : BrandColors.border,
           ),
+          boxShadow: isSelected ? BrandShadows.small : null,
         ),
         child: Text(
           label,
           style: TextStyle(
             fontSize: 13,
-            fontWeight: FontWeight.w500,
-            color: isSelected ? Colors.white : Colors.grey[700],
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+            color: isSelected ? BrandColors.textOnPrimary : BrandColors.textSecondary,
           ),
         ),
       ),

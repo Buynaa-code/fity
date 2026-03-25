@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/services/checkin_service.dart';
 import '../../../core/ui/theme/app_colors.dart';
 import '../../../core/ui/theme/app_spacing.dart';
@@ -20,6 +21,19 @@ class _CheckinsListScreenState extends State<CheckinsListScreen> {
   void initState() {
     super.initState();
     _loadCheckIns();
+    // Auto-refresh every 30 seconds for active session durations
+    _startAutoRefresh();
+  }
+
+  void _startAutoRefresh() {
+    Future.delayed(const Duration(seconds: 30), () {
+      if (mounted && _activeCount > 0) {
+        _loadCheckIns();
+        _startAutoRefresh();
+      } else if (mounted) {
+        _startAutoRefresh();
+      }
+    });
   }
 
   Future<void> _loadCheckIns() async {
@@ -46,6 +60,136 @@ class _CheckinsListScreenState extends State<CheckinsListScreen> {
         _isLoading = false;
       });
     }
+  }
+
+  Future<void> _checkOutMember(CheckInRecord record) async {
+    HapticFeedback.mediumImpact();
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.warning.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+              child: const Icon(Icons.logout_rounded, color: AppColors.warning),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            const Expanded(child: Text('Check-out')),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Гишүүн #${record.oderId.length >= 6 ? record.oderId.substring(0, 6) : record.oderId}-г check-out хийх үү?',
+              style: AppTypography.bodyMedium,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceVariant,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.timer_outlined, size: 18, color: AppColors.textSecondary),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    'Хугацаа: ${_formatDuration(record.currentDuration)}',
+                    style: AppTypography.labelMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(
+              'Цуцлах',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.warning,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+            ),
+            child: const Text('Check-out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await CheckInService.instance.checkOutById(record.id);
+        HapticFeedback.heavyImpact();
+        await _loadCheckIns();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Check-out амжилттай! ${_formatDuration(record.currentDuration)}',
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: AppColors.success,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Алдаа: $e'),
+              backgroundColor: AppColors.error,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  String _formatDuration(Duration duration) {
+    final hours = duration.inHours;
+    final minutes = duration.inMinutes % 60;
+    if (hours > 0) {
+      return '$hours цаг $minutes мин';
+    }
+    return '$minutes мин';
   }
 
   @override
@@ -289,7 +433,9 @@ class _CheckinsListScreenState extends State<CheckinsListScreen> {
     final hours = duration?.inHours ?? 0;
     final minutes = (duration?.inMinutes ?? 0) % 60;
 
-    return Container(
+    return GestureDetector(
+      onTap: isActive ? () => _checkOutMember(record) : null,
+      child: Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: isActive
@@ -338,7 +484,7 @@ class _CheckinsListScreenState extends State<CheckinsListScreen> {
                 Row(
                   children: [
                     Text(
-                      'Гишүүн #${record.oderId.substring(0, 6)}',
+                      'Гишүүн #${record.oderId.length >= 6 ? record.oderId.substring(0, 6) : record.oderId}',
                       style: AppTypography.titleSmall,
                     ),
                     if (isActive) ...[
@@ -371,16 +517,29 @@ class _CheckinsListScreenState extends State<CheckinsListScreen> {
               ],
             ),
           ),
-          // Duration
+          // Duration and checkout indicator
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(
-                hours > 0 ? '${hours}ц ${minutes}м' : '${minutes}м',
-                style: AppTypography.titleSmall.copyWith(
-                  color: isActive ? AppColors.success : AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    hours > 0 ? '$hoursц $minutesм' : '$minutesм',
+                    style: AppTypography.titleSmall.copyWith(
+                      color: isActive ? AppColors.success : AppColors.primary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  if (isActive) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.logout_rounded,
+                      size: 16,
+                      color: AppColors.success.withValues(alpha: 0.7),
+                    ),
+                  ],
+                ],
               ),
               if (record.xpEarned != null && !isActive)
                 Text(
@@ -389,10 +548,19 @@ class _CheckinsListScreenState extends State<CheckinsListScreen> {
                     color: AppColors.secondary,
                   ),
                 ),
+              if (isActive)
+                Text(
+                  'Дарж check-out',
+                  style: AppTypography.labelSmall.copyWith(
+                    color: AppColors.success.withValues(alpha: 0.7),
+                    fontSize: 10,
+                  ),
+                ),
             ],
           ),
         ],
       ),
+    ),
     );
   }
 

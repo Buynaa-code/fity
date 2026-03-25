@@ -52,19 +52,71 @@ class _ReceptionistScannerScreenState extends State<ReceptionistScannerScreen> {
 
     HapticFeedback.mediumImpact();
 
-    // Try to parse member info from QR, or use default
-    String oderId = 'guest_${DateTime.now().millisecondsSinceEpoch}';
+    String oderId = '';
     String userName = 'Гишүүн';
 
     try {
       final data = jsonDecode(rawValue) as Map<String, dynamic>;
-      oderId = data['u'] as String? ?? oderId;
-      userName = data['n'] as String? ?? userName;
+
+      // Check QR version
+      final version = data['v'] as int? ?? 1;
+      oderId = data['u'] as String? ?? '';
+      userName = data['n'] as String? ?? 'Гишүүн';
+
+      if (oderId.isEmpty) {
+        setState(() {
+          _errorMessage = 'QR код буруу байна. Хэрэглэгчийн мэдээлэл олдсонгүй.';
+          _isProcessing = false;
+        });
+        HapticFeedback.heavyImpact();
+        await Future.delayed(const Duration(seconds: 3));
+        if (mounted) setState(() => _errorMessage = null);
+        return;
+      }
+
+      // Validate token expiration for v2 QR codes
+      if (version >= 2) {
+        final expTimestamp = data['exp'] as int?;
+        if (expTimestamp != null) {
+          final expiresAt = DateTime.fromMillisecondsSinceEpoch(expTimestamp);
+          if (DateTime.now().isAfter(expiresAt)) {
+            setState(() {
+              _errorMessage = 'QR кодын хугацаа дууссан байна.\nШинэ QR код үүсгэнэ үү.';
+              _isProcessing = false;
+            });
+            HapticFeedback.heavyImpact();
+            await Future.delayed(const Duration(seconds: 3));
+            if (mounted) setState(() => _errorMessage = null);
+            return;
+          }
+        }
+      }
+
     } catch (_) {
-      // Use defaults if QR is not in expected format
+      setState(() {
+        _errorMessage = 'QR код таних боломжгүй.\nЗөв QR код уншуулна уу.';
+        _isProcessing = false;
+      });
+      HapticFeedback.heavyImpact();
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) setState(() => _errorMessage = null);
+      return;
     }
 
-    // Always check-in successfully
+    // Check for duplicate check-in (already active session)
+    final activeCheckIn = await CheckInService.instance.getActiveCheckInByUserId(oderId);
+    if (activeCheckIn != null) {
+      setState(() {
+        _errorMessage = '$userName аль хэдийн check-in хийсэн байна.\nЭхлээд check-out хийнэ үү.';
+        _isProcessing = false;
+      });
+      HapticFeedback.heavyImpact();
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) setState(() => _errorMessage = null);
+      return;
+    }
+
+    // Perform check-in
     await CheckInService.instance.checkIn(oderId);
 
     setState(() {

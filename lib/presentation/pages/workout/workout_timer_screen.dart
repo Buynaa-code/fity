@@ -110,11 +110,14 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
     _startTimer();
   }
 
-  void _startRest() {
+  int _selectedRestTime = 60; // Default rest time
+
+  void _startRest(int restSeconds) {
     HapticFeedback.heavyImpact();
     setState(() {
       _isResting = true;
-      _restCountdown = widget.restSeconds ?? 60;
+      _restCountdown = restSeconds;
+      _selectedRestTime = restSeconds;
     });
     _timer?.cancel();
 
@@ -140,10 +143,258 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
     _timer?.cancel();
 
     if (_currentSet < _totalSets) {
-      _startRest();
+      _showRestTimeSelection();
     } else {
       _finishWorkout();
     }
+  }
+
+  void _showRestTimeSelection() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isDismissible: true,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1A1A1A),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              '⏱️ Амрах хугацаа',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Дасгалын хүнд хөнгөний дагуу сонгоно уу',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.6),
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 24),
+
+            // Rest time options
+            Row(
+              children: [
+                // Heavy exercise - 1:30
+                Expanded(
+                  child: _buildRestOption(
+                    icon: Icons.fitness_center_rounded,
+                    label: 'Хүнд дасгал',
+                    time: '1:30',
+                    seconds: 90,
+                    color: const Color(0xFFF72928),
+                    description: 'Squat, Deadlift, Bench',
+                  ),
+                ),
+                const SizedBox(width: 12),
+                // Light exercise - 1:00
+                Expanded(
+                  child: _buildRestOption(
+                    icon: Icons.directions_run_rounded,
+                    label: 'Хөнгөн дасгал',
+                    time: '1:00',
+                    seconds: 60,
+                    color: const Color(0xFF1ABC9C),
+                    description: 'Push-up, Plank, Crunch',
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 16),
+
+            // Additional quick options
+            Row(
+              children: [
+                Expanded(
+                  child: _buildQuickRestButton(
+                    label: '45с',
+                    seconds: 45,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildQuickRestButton(
+                    label: '2 мин',
+                    seconds: 120,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _buildQuickRestButton(
+                    label: '3 мин',
+                    seconds: 180,
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 20),
+
+            // Skip rest button
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _currentSet++;
+                  if (_currentSet <= _totalSets) {
+                    _startTimer();
+                  }
+                });
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: const Center(
+                  child: Text(
+                    'Амрахгүй үргэлжлүүлэх →',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRestOption({
+    required IconData icon,
+    required String label,
+    required String time,
+    required int seconds,
+    required Color color,
+    required String description,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        HapticFeedback.mediumImpact();
+        _startRest(seconds);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              color.withValues(alpha: 0.2),
+              color.withValues(alpha: 0.1),
+            ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: color.withValues(alpha: 0.4),
+            width: 1.5,
+          ),
+        ),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(icon, color: color, size: 28),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              time,
+              style: TextStyle(
+                color: color,
+                fontSize: 28,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.5),
+                fontSize: 11,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickRestButton({
+    required String label,
+    required int seconds,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pop(context);
+        HapticFeedback.mediumImpact();
+        _startRest(seconds);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: Colors.white.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void _finishWorkout() {
@@ -255,7 +506,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
                 CircularProgressIndicator(
                   value: _currentSet / _totalSets,
                   backgroundColor: Colors.white.withValues(alpha: 0.1),
-                  valueColor: const AlwaysStoppedAnimation(Color(0xFFFE7409)),
+                  valueColor: const AlwaysStoppedAnimation(Color(0xFFF72928)),
                   strokeWidth: 4,
                 ),
                 Text(
@@ -406,7 +657,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
               Icons.timer_rounded,
               '$_currentSet/$_totalSets',
               'багц',
-              const Color(0xFFFE7409),
+              const Color(0xFFF72928),
             ),
           ],
         ),
@@ -459,7 +710,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
                 width: 200,
                 height: 200,
                 child: CircularProgressIndicator(
-                  value: _restCountdown / (widget.restSeconds ?? 60),
+                  value: _restCountdown / _selectedRestTime,
                   backgroundColor: Colors.white.withValues(alpha: 0.2),
                   valueColor: const AlwaysStoppedAnimation(Colors.white),
                   strokeWidth: 8,
@@ -490,7 +741,68 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
           ),
         ),
 
-        const SizedBox(height: 40),
+        const SizedBox(height: 30),
+
+        // Rest time adjustment buttons
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Reduce 15 sec
+            GestureDetector(
+              onTap: () {
+                if (_restCountdown > 15) {
+                  HapticFeedback.lightImpact();
+                  setState(() {
+                    _restCountdown -= 15;
+                  });
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  '-15с',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Add 15 sec
+            GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _restCountdown += 15;
+                  if (_restCountdown > _selectedRestTime) {
+                    _selectedRestTime = _restCountdown;
+                  }
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  '+15с',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        const SizedBox(height: 20),
 
         // Skip rest button
         GestureDetector(
@@ -642,19 +954,19 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
                   height: 60,
                   decoration: BoxDecoration(
                     color: _seconds > 0
-                        ? const Color(0xFFFE7409).withValues(alpha: 0.2)
+                        ? const Color(0xFFF72928).withValues(alpha: 0.2)
                         : Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: _seconds > 0
-                          ? const Color(0xFFFE7409)
+                          ? const Color(0xFFF72928)
                           : Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
                   child: Icon(
                     Icons.check_rounded,
                     color: _seconds > 0
-                        ? const Color(0xFFFE7409)
+                        ? const Color(0xFFF72928)
                         : Colors.white.withValues(alpha: 0.3),
                     size: 28,
                   ),
@@ -674,12 +986,12 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+                    colors: [Color(0xFFF72928), Color(0xFFFF9149)],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFFFE7409).withValues(alpha: 0.4),
+                      color: const Color(0xFFF72928).withValues(alpha: 0.4),
                       blurRadius: 20,
                       offset: const Offset(0, 8),
                     ),
@@ -839,7 +1151,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+                    colors: [Color(0xFFF72928), Color(0xFFFF9149)],
                   ),
                   borderRadius: BorderRadius.circular(18),
                 ),
@@ -872,7 +1184,7 @@ class _WorkoutTimerScreenState extends State<WorkoutTimerScreen>
             color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(14),
           ),
-          child: Icon(icon, color: const Color(0xFFFE7409), size: 22),
+          child: Icon(icon, color: const Color(0xFFF72928), size: 22),
         ),
         const SizedBox(height: 8),
         Text(

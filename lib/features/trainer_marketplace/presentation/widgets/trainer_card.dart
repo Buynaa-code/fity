@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/branding/brand_config.dart';
 import '../../domain/entities/trainer.dart';
 
 class TrainerCard extends StatelessWidget {
@@ -13,49 +14,86 @@ class TrainerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Check availability (has available slots in next 7 days)
+    final hasAvailability = trainer.availableSlots.any((slot) => slot.isAvailable);
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: BrandColors.surface,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: BrandShadows.small,
         ),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
             children: [
-              // Trainer Image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  trainer.imageUrl,
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
+              // Trainer Image with availability indicator
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      trainer.imageUrl,
                       width: 80,
                       height: 80,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          width: 80,
+                          height: 80,
+                          decoration: BoxDecoration(
+                            color: BrandColors.primarySurface,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.person,
+                            size: 40,
+                            color: BrandColors.primary,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  // Availability indicator
+                  Positioned(
+                    bottom: 4,
+                    right: 4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFE7409).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        color: hasAvailability
+                            ? BrandColors.success
+                            : BrandColors.textTertiary,
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      child: const Icon(
-                        Icons.person,
-                        size: 40,
-                        color: Color(0xFFFE7409),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            hasAvailability ? 'Сул' : 'Завгүй',
+                            style: const TextStyle(
+                              fontSize: 9,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(width: 16),
               // Trainer Info
@@ -63,15 +101,37 @@ class TrainerCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      trainer.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            trainer.name,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: BrandColors.textPrimary,
+                            ),
+                          ),
+                        ),
+                        // Experience badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: BrandColors.secondary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            '${trainer.experienceYears} жил',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: BrandColors.secondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     // Specialties
                     Wrap(
                       spacing: 6,
@@ -80,62 +140,76 @@ class TrainerCard extends StatelessWidget {
                         return Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 8,
-                            vertical: 2,
+                            vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFE7409).withOpacity(0.1),
+                            color: BrandColors.primarySurface,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             specialty,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
-                              color: Color(0xFFFE7409),
+                              color: BrandColors.primary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         );
                       }).toList(),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     // Rating and Price
                     Row(
                       children: [
-                        const Icon(
-                          Icons.star_rounded,
-                          size: 16,
-                          color: Colors.amber,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          trainer.rating.toStringAsFixed(1),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                        // Rating
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: BrandColors.warning.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
                           ),
-                        ),
-                        Text(
-                          ' (${trainer.reviewCount})',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.star_rounded,
+                                size: 14,
+                                color: BrandColors.warning,
+                              ),
+                              const SizedBox(width: 3),
+                              Text(
+                                trainer.rating.toStringAsFixed(1),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: BrandColors.textPrimary,
+                                ),
+                              ),
+                              Text(
+                                ' (${trainer.reviewCount})',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: BrandColors.textSecondary,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const Spacer(),
+                        // Price
                         Text(
                           '₮${_formatPrice(trainer.hourlyRate)}',
-                          style: const TextStyle(
-                            fontSize: 15,
+                          style: TextStyle(
+                            fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFFFE7409),
+                            color: BrandColors.primary,
                           ),
                         ),
                         Text(
                           '/цаг',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.grey[600],
+                            color: BrandColors.textSecondary,
                           ),
                         ),
                       ],
@@ -144,9 +218,9 @@ class TrainerCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              const Icon(
+              Icon(
                 Icons.chevron_right_rounded,
-                color: Colors.grey,
+                color: BrandColors.textTertiary,
               ),
             ],
           ),

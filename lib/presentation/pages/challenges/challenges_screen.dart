@@ -24,8 +24,8 @@ class _ChallengesScreenState extends State<ChallengesScreen>
       currentDay: 12,
       participants: 2456,
       prize: '500,000₮ + Premium эрх',
-      color: const Color(0xFFFE7409),
-      gradientColors: [const Color(0xFFFE7409), const Color(0xFFFF6B35)],
+      color: const Color(0xFFF72928),
+      gradientColors: [const Color(0xFFF72928), const Color(0xFFFF6B35)],
       isJoined: true,
       milestones: [
         Milestone(day: 7, title: '1 долоо хоног', reward: 100, isCompleted: true),
@@ -235,7 +235,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
         controller: _tabController,
         indicator: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+            colors: [Color(0xFFF72928), Color(0xFFFF9149)],
           ),
           borderRadius: BorderRadius.circular(14),
         ),
@@ -471,7 +471,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
               borderRadius: BorderRadius.circular(6),
             ),
             child: task.isCompleted
-                ? const Icon(Icons.check, color: Color(0xFFFE7409), size: 16)
+                ? const Icon(Icons.check, color: Color(0xFFF72928), size: 16)
                 : null,
           ),
           const SizedBox(width: 12),
@@ -780,7 +780,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
       decoration: BoxDecoration(
-        color: isCurrentUser ? const Color(0xFFFE7409).withValues(alpha: 0.1) : null,
+        color: isCurrentUser ? const Color(0xFFF72928).withValues(alpha: 0.1) : null,
         border: Border(
           bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
         ),
@@ -831,7 +831,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
           Text(
             '${entry.points}',
             style: const TextStyle(
-              color: Color(0xFFFE7409),
+              color: Color(0xFFF72928),
               fontWeight: FontWeight.w700,
               fontSize: 16,
             ),
@@ -917,7 +917,7 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             : const Color(0xFF1A1A1A).withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
         border: achievement.isUnlocked
-            ? Border.all(color: const Color(0xFFFE7409).withValues(alpha: 0.3))
+            ? Border.all(color: const Color(0xFFF72928).withValues(alpha: 0.3))
             : null,
       ),
       child: Column(
@@ -957,14 +957,14 @@ class _ChallengesScreenState extends State<ChallengesScreen>
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               color: achievement.isUnlocked
-                  ? const Color(0xFFFE7409).withValues(alpha: 0.2)
+                  ? const Color(0xFFF72928).withValues(alpha: 0.2)
                   : Colors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
               '+${achievement.xp} XP',
               style: TextStyle(
-                color: achievement.isUnlocked ? const Color(0xFFFE7409) : Colors.grey,
+                color: achievement.isUnlocked ? const Color(0xFFF72928) : Colors.grey,
                 fontWeight: FontWeight.w700,
                 fontSize: 12,
               ),

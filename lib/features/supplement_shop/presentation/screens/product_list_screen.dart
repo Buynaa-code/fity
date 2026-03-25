@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/branding/brand_config.dart';
 import '../../bloc/cart_bloc.dart';
 import '../../bloc/cart_event.dart';
+import '../../bloc/cart_state.dart';
 import '../../data/sample_products.dart';
 import '../../domain/entities/product.dart';
 import '../widgets/product_card.dart';
@@ -16,8 +19,6 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListScreenState extends State<ProductListScreen>
     with SingleTickerProviderStateMixin {
-  static const Color primaryColor = Color(0xFFFE7409);
-
   ProductCategory? _selectedCategory;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -28,7 +29,7 @@ class _ProductListScreenState extends State<ProductListScreen>
   @override
   void initState() {
     super.initState();
-    _cartBloc = CartBloc();
+    _cartBloc = CartBloc()..add(const CartLoadRequested());
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -43,7 +44,7 @@ class _ProductListScreenState extends State<ProductListScreen>
   void dispose() {
     _searchController.dispose();
     _animationController.dispose();
-    _cartBloc.dispose();
+    _cartBloc.close();
     super.dispose();
   }
 
@@ -75,7 +76,7 @@ class _ProductListScreenState extends State<ProductListScreen>
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${product.name} сагсанд нэмэгдлээ'),
-        backgroundColor: primaryColor,
+        backgroundColor: BrandColors.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         action: SnackBarAction(
@@ -98,18 +99,21 @@ class _ProductListScreenState extends State<ProductListScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: SafeArea(
-        child: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildSearchBar(),
-              _buildCategoryFilter(),
-              Expanded(child: _buildProductGrid()),
-            ],
+    return BlocProvider.value(
+      value: _cartBloc,
+      child: Scaffold(
+        backgroundColor: BrandColors.background,
+        body: SafeArea(
+          child: FadeTransition(
+            opacity: _fadeAnimation,
+            child: Column(
+              children: [
+                _buildHeader(),
+                _buildSearchBar(),
+                _buildCategoryFilter(),
+                Expanded(child: _buildProductGrid()),
+              ],
+            ),
           ),
         ),
       ),
@@ -126,25 +130,19 @@ class _ProductListScreenState extends State<ProductListScreen>
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: BrandColors.surface,
                 borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                boxShadow: BrandShadows.small,
               ),
               child: const Icon(Icons.arrow_back_ios_new, size: 20),
             ),
           ),
           const SizedBox(width: 16),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Тэжээлийн нэмэлт',
                   style: TextStyle(
                     fontSize: 24,
@@ -155,7 +153,7 @@ class _ProductListScreenState extends State<ProductListScreen>
                   'Чанартай бүтээгдэхүүн',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.grey,
+                    color: BrandColors.textSecondary,
                   ),
                 ),
               ],
@@ -168,24 +166,17 @@ class _ProductListScreenState extends State<ProductListScreen>
   }
 
   Widget _buildCartButton() {
-    return ListenableBuilder(
-      listenable: _cartBloc,
-      builder: (context, _) {
-        final itemCount = _cartBloc.state.itemCount;
+    return BlocBuilder<CartBloc, CartState>(
+      builder: (context, state) {
+        final itemCount = state.itemCount;
         return GestureDetector(
           onTap: _openCart,
           child: Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: primaryColor,
+              color: BrandColors.primary,
               borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: primaryColor.withOpacity(0.3),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              boxShadow: BrandShadows.primaryGlow,
             ),
             child: Stack(
               clipBehavior: Clip.none,
@@ -201,8 +192,8 @@ class _ProductListScreenState extends State<ProductListScreen>
                     top: -8,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
+                      decoration: BoxDecoration(
+                        color: BrandColors.error,
                         shape: BoxShape.circle,
                       ),
                       constraints: const BoxConstraints(
@@ -233,15 +224,9 @@ class _ProductListScreenState extends State<ProductListScreen>
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: BrandColors.surface,
           borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+          boxShadow: BrandShadows.small,
         ),
         child: TextField(
           controller: _searchController,
@@ -252,11 +237,11 @@ class _ProductListScreenState extends State<ProductListScreen>
           },
           decoration: InputDecoration(
             hintText: 'Бүтээгдэхүүн хайх...',
-            hintStyle: TextStyle(color: Colors.grey[400]),
-            prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+            hintStyle: TextStyle(color: BrandColors.textTertiary),
+            prefixIcon: Icon(Icons.search, color: BrandColors.textTertiary),
             suffixIcon: _searchQuery.isNotEmpty
                 ? IconButton(
-                    icon: const Icon(Icons.clear, color: Colors.grey),
+                    icon: Icon(Icons.clear, color: BrandColors.textTertiary),
                     onPressed: () {
                       _searchController.clear();
                       setState(() {
@@ -304,14 +289,14 @@ class _ProductListScreenState extends State<ProductListScreen>
             _selectedCategory = selected ? category : null;
           });
         },
-        backgroundColor: Colors.white,
-        selectedColor: primaryColor.withOpacity(0.15),
+        backgroundColor: BrandColors.surface,
+        selectedColor: BrandColors.primarySurface,
         labelStyle: TextStyle(
-          color: isSelected ? primaryColor : Colors.grey[700],
+          color: isSelected ? BrandColors.primary : BrandColors.textSecondary,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
         ),
         side: BorderSide(
-          color: isSelected ? primaryColor : Colors.grey[300]!,
+          color: isSelected ? BrandColors.primary : BrandColors.border,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -329,13 +314,24 @@ class _ProductListScreenState extends State<ProductListScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off, size: 64, color: Colors.grey[300]),
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: BrandColors.primarySurface,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.search_off,
+                size: 48,
+                color: BrandColors.primary.withValues(alpha: 0.5),
+              ),
+            ),
             const SizedBox(height: 16),
             Text(
               'Бүтээгдэхүүн олдсонгүй',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey[600],
+                color: BrandColors.textSecondary,
               ),
             ),
           ],

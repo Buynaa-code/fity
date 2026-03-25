@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
 
-  static const primaryColor = Color(0xFFFE7409);
+  static const primaryColor = Color(0xFFF72928);
 
   Future<void> _signInWithGoogle() async {
     setState(() {

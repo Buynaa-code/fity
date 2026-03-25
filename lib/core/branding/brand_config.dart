@@ -100,20 +100,20 @@ FITY - Монголын анхны бүрэн Монгол хэл дээрх fit
 /// Brand өнгөний систем
 class BrandColors {
   // ============================================
-  // PRIMARY BRAND COLOR - ЭНЕРГИЧНЫЙ АПЕЛЬСИН
+  // PRIMARY BRAND COLOR - ЭРЧИМТЭЙ УЛААН
   // ============================================
 
-  /// Үндсэн брэнд өнгө - Идэвхтэй, эрч хүчтэй
-  static const Color primary = Color(0xFFFE7409);
-  static const Color primaryLight = Color(0xFFFF9149);
-  static const Color primaryDark = Color(0xFFE56607);
-  static const Color primarySurface = Color(0xFFFFF3E8);
+  /// Үндсэн брэнд өнгө - Хүч чадал, эрч хүч
+  static const Color primary = Color(0xFFF72928);
+  static const Color primaryLight = Color(0xFFFF5A59);
+  static const Color primaryDark = Color(0xFF911817);
+  static const Color primarySurface = Color(0xFFFEECEC);
 
   // Primary өнгөний утга:
-  // - Эрч хүч, идэвхи
-  // - Урам зориг
-  // - Дулаан, найрсаг
-  // - Action товчнууд
+  // - Хүч чадал, эрч хүч
+  // - Урам зориг, идэвхжил
+  // - Зориг, шийдэмгий байдал
+  // - Action товчнууд, CTA
 
   // ============================================
   // SECONDARY COLOR - ХҮЧИРХЭГ НӨМГӨН
@@ -159,6 +159,12 @@ class BrandColors {
   static const Color errorDark = Color(0xFFC0392B);
   static const Color errorSurface = Color(0xFFFDEDEC);
 
+  /// Цэнхэр - Мэдээлэл, info
+  static const Color info = Color(0xFF3498DB);
+  static const Color infoLight = Color(0xFF5DADE2);
+  static const Color infoDark = Color(0xFF2980B9);
+  static const Color infoSurface = Color(0xFFEBF5FB);
+
   // ============================================
   // WORKOUT TYPE COLORS
   // ============================================
@@ -172,8 +178,8 @@ class BrandColors {
   /// Flexibility - Ягаан (уян хатан, тайвширал)
   static const Color flexibility = Color(0xFF9B59B6);
 
-  /// HIIT - Улбар шар (эрчимтэй)
-  static const Color hiit = Color(0xFFFE7409);
+  /// HIIT - Улаан (эрчимтэй)
+  static const Color hiit = Color(0xFFF72928);
 
   /// Yoga - Ногоон (тэнцвэр, амгалан)
   static const Color yoga = Color(0xFF1ABC9C);
@@ -188,9 +194,9 @@ class BrandColors {
   /// XP - Алтан шар
   static const Color xp = Color(0xFFFFD700);
 
-  /// Streak fire - Улбар шар → Улаан gradient
-  static const Color streakStart = Color(0xFFFF6B35);
-  static const Color streakEnd = Color(0xFFFFAB40);
+  /// Streak fire - Улаан gradient
+  static const Color streakStart = Color(0xFFF72928);
+  static const Color streakEnd = Color(0xFFFF5A59);
 
   /// Badge - Алтан
   static const Color badge = Color(0xFFFFD700);
@@ -360,7 +366,7 @@ class BrandGradients {
 
   /// Morning gradient (5-10 AM)
   static const LinearGradient morning = LinearGradient(
-    colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+    colors: [Color(0xFFF72928), Color(0xFFFF5A59)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

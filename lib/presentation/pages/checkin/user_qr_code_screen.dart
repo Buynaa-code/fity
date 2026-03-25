@@ -499,7 +499,11 @@ class _UserQRCodeScreenState extends State<UserQRCodeScreen>
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('🔥', style: TextStyle(fontSize: 14)),
+                        const Icon(
+                          Icons.local_fire_department_rounded,
+                          size: 14,
+                          color: Colors.white,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           '${_stats.currentStreak}',
@@ -728,7 +732,11 @@ class _UserQRCodeScreenState extends State<UserQRCodeScreen>
               if (showFire)
                 const Padding(
                   padding: EdgeInsets.only(left: 4),
-                  child: Text('🔥', style: TextStyle(fontSize: 16)),
+                  child: Icon(
+                    Icons.local_fire_department_rounded,
+                    size: 16,
+                    color: AppColors.streak,
+                  ),
                 ),
             ],
           ),
@@ -1144,7 +1152,7 @@ class _UserQRCodeScreenState extends State<UserQRCodeScreen>
                 )
               else
                 Text(
-                  hours > 0 ? '${hours}ц ${minutes}м' : '${minutes}м',
+                  hours > 0 ? '$hoursц $minutesм' : '$minutesм',
                   style: AppTypography.titleSmall.copyWith(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w700,

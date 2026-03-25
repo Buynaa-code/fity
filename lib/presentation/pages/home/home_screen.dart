@@ -111,12 +111,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       data:
           _isDarkMode
               ? ThemeData.dark().copyWith(
-                primaryColor: const Color(0xFFFE7409),
+                primaryColor: const Color(0xFFF72928),
                 scaffoldBackgroundColor: const Color(0xFF121212),
                 cardColor: const Color(0xFF1E1E1E),
               )
               : ThemeData.light().copyWith(
-                primaryColor: const Color(0xFFFE7409),
+                primaryColor: const Color(0xFFF72928),
                 scaffoldBackgroundColor: Colors.grey[50],
               ),
       child: Scaffold(
@@ -139,13 +139,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       gradient: LinearGradient(
-                        colors: [Color(0xFFFE7409), Color(0xFFFF9500)],
+                        colors: [Color(0xFFF72928), Color(0xFFFF9500)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Color(0xFFFE7409).withOpacity(0.4),
+                          color: Color(0xFFF72928).withOpacity(0.4),
                           blurRadius: 12,
                           offset: Offset(0, 4),
                         ),
@@ -225,7 +225,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               type: BottomNavigationBarType.fixed,
               backgroundColor:
                   _isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-              selectedItemColor: const Color(0xFFFE7409),
+              selectedItemColor: const Color(0xFFF72928),
               unselectedItemColor:
                   _isDarkMode ? Colors.grey[500] : Colors.grey[600],
               selectedLabelStyle: const TextStyle(
@@ -624,7 +624,7 @@ class _HomeContentState extends State<_HomeContent>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFFE7409).withOpacity(0.3),
+                color: const Color(0xFFF72928).withOpacity(0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -639,7 +639,7 @@ class _HomeContentState extends State<_HomeContent>
                 return Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [Color(0xFFFE7409), Color(0xFFFF9500)],
+                      colors: [Color(0xFFF72928), Color(0xFFFF9500)],
                     ),
                   ),
                   child: Icon(Icons.person, color: Colors.white, size: 30),
@@ -681,10 +681,10 @@ class _HomeContentState extends State<_HomeContent>
                         vertical: 3,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFE7409).withOpacity(0.15),
+                        color: const Color(0xFFF72928).withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: const Color(0xFFFE7409).withOpacity(0.3),
+                          color: const Color(0xFFF72928).withOpacity(0.3),
                         ),
                       ),
                       child: Row(
@@ -696,7 +696,7 @@ class _HomeContentState extends State<_HomeContent>
                             '7d',
                             style: TextStyle(
                               fontSize: 11,
-                              color: const Color(0xFFFE7409),
+                              color: const Color(0xFFF72928),
                               fontWeight: FontWeight.w700,
                             ),
                           ),
@@ -801,7 +801,7 @@ class _HomeContentState extends State<_HomeContent>
                               width: 8,
                               height: 8,
                               decoration: const BoxDecoration(
-                                color: Color(0xFFFE7409),
+                                color: Color(0xFFF72928),
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -821,11 +821,11 @@ class _HomeContentState extends State<_HomeContent>
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15),
                 gradient: const LinearGradient(
-                  colors: [Color(0xFFFE7409), Color(0xFFFF8A33)],
+                  colors: [Color(0xFFF72928), Color(0xFFFF8A33)],
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFFE7409).withOpacity(0.3),
+                    color: const Color(0xFFF72928).withOpacity(0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -927,16 +927,16 @@ class _HomeContentState extends State<_HomeContent>
                       vertical: 8,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFE7409).withOpacity(0.2),
+                      color: const Color(0xFFF72928).withOpacity(0.2),
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: const Color(0xFFFE7409).withOpacity(0.4),
+                        color: const Color(0xFFF72928).withOpacity(0.4),
                       ),
                     ),
                     child: const Text(
                       '🔥 Progress',
                       style: TextStyle(
-                        color: Color(0xFFFE7409),
+                        color: Color(0xFFF72928),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1832,7 +1832,7 @@ class _HomeContentState extends State<_HomeContent>
             Expanded(
               child: _buildQuickActionCard(
                 icon: Icons.shopping_bag_rounded,
-                iconColor: const Color(0xFFFE7409),
+                iconColor: const Color(0xFFF72928),
                 title: 'Дэлгүүр',
                 subtitle: 'Тэжээлийн нэмэлт',
                 onTap: () {
@@ -1865,10 +1865,10 @@ class _HomeContentState extends State<_HomeContent>
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFE7409).withOpacity(0.1),
+                  color: const Color(0xFFF72928).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: const Color(0xFFFE7409).withOpacity(0.3),
+                    color: const Color(0xFFF72928).withOpacity(0.3),
                   ),
                 ),
                 child: Row(
@@ -1876,14 +1876,14 @@ class _HomeContentState extends State<_HomeContent>
                   children: [
                     Icon(
                       Icons.settings_rounded,
-                      color: const Color(0xFFFE7409),
+                      color: const Color(0xFFF72928),
                       size: 16,
                     ),
                     const SizedBox(width: 4),
                     Text(
                       'Тохиргоо',
                       style: TextStyle(
-                        color: const Color(0xFFFE7409),
+                        color: const Color(0xFFF72928),
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
@@ -1930,7 +1930,7 @@ class _HomeContentState extends State<_HomeContent>
                               isToday
                                   ? BoxDecoration(
                                     color: const Color(
-                                      0xFFFE7409,
+                                      0xFFF72928,
                                     ).withOpacity(0.1),
                                     borderRadius: BorderRadius.circular(8),
                                   )
@@ -1943,7 +1943,7 @@ class _HomeContentState extends State<_HomeContent>
                                   isToday ? FontWeight.bold : FontWeight.w500,
                               color:
                                   isToday
-                                      ? const Color(0xFFFE7409)
+                                      ? const Color(0xFFF72928)
                                       : (widget.isDarkMode
                                           ? Colors.grey[400]
                                           : Colors.grey[600]),
@@ -1972,7 +1972,7 @@ class _HomeContentState extends State<_HomeContent>
                   final programColor =
                       workoutProgram.isNotEmpty
                           ? _getWorkoutProgramColor(workoutProgram)
-                          : const Color(0xFFFE7409);
+                          : const Color(0xFFF72928);
 
                   return Expanded(
                     child: GestureDetector(
@@ -1994,7 +1994,7 @@ class _HomeContentState extends State<_HomeContent>
                                     color:
                                         hasWorkout
                                             ? Colors.white
-                                            : const Color(0xFFFE7409),
+                                            : const Color(0xFFF72928),
                                     width: 2,
                                   )
                                   : null,
@@ -2071,7 +2071,7 @@ class _HomeContentState extends State<_HomeContent>
   Widget _buildScheduleStat(String label, String value, IconData icon) {
     return Column(
       children: [
-        Icon(icon, color: const Color(0xFFFE7409), size: 18),
+        Icon(icon, color: const Color(0xFFF72928), size: 18),
         const SizedBox(height: 4),
         Text(
           label,
@@ -2137,7 +2137,7 @@ class _HomeContentState extends State<_HomeContent>
       'Кардио': const Color(0xFFE91E63),
       'Бүх бие': const Color(0xFF34495E),
     };
-    return programColors[program] ?? const Color(0xFFFE7409);
+    return programColors[program] ?? const Color(0xFFF72928);
   }
 
   String _getNextWorkoutInfo() {
@@ -2176,7 +2176,7 @@ class _HomeContentState extends State<_HomeContent>
           color:
               hasWorkout
                   ? _getWorkoutProgramColor(program)
-                  : const Color(0xFFFE7409),
+                  : const Color(0xFFF72928),
           size: 18,
         ),
         const SizedBox(height: 4),
@@ -2822,7 +2822,7 @@ class _WorkoutStatsSheet extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFE7409),
+                  backgroundColor: const Color(0xFFF72928),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -3044,7 +3044,7 @@ class _WorkoutScheduleSettingsSheetState
                     children: [
                       Icon(
                         Icons.schedule_rounded,
-                        color: const Color(0xFFFE7409),
+                        color: const Color(0xFFF72928),
                         size: 28,
                       ),
                       const SizedBox(width: 12),
@@ -3130,7 +3130,7 @@ class _WorkoutScheduleSettingsSheetState
                                                 HapticFeedback.selectionClick();
                                               },
                                               activeThumbColor: const Color(
-                                                0xFFFE7409,
+                                                0xFFF72928,
                                               ),
                                             ),
                                           ],
@@ -3320,13 +3320,13 @@ class _WorkoutScheduleSettingsSheetState
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: const Color(
-                                        0xFFFE7409,
+                                        0xFFF72928,
                                       ).withOpacity(0.1),
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: const Icon(
                                       Icons.access_time_rounded,
-                                      color: Color(0xFFFE7409),
+                                      color: Color(0xFFF72928),
                                       size: 24,
                                     ),
                                   ),
@@ -3397,7 +3397,7 @@ class _WorkoutScheduleSettingsSheetState
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w600,
-                                    color: const Color(0xFFFE7409),
+                                    color: const Color(0xFFF72928),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
@@ -3423,7 +3423,7 @@ class _WorkoutScheduleSettingsSheetState
                                             decoration: BoxDecoration(
                                               color:
                                                   isSelected
-                                                      ? const Color(0xFFFE7409)
+                                                      ? const Color(0xFFF72928)
                                                       : (widget.isDarkMode
                                                           ? Colors.grey[800]
                                                           : Colors.grey[200]),
@@ -3498,7 +3498,7 @@ class _WorkoutScheduleSettingsSheetState
                                           });
                                           HapticFeedback.selectionClick();
                                         },
-                                        activeColor: const Color(0xFFFE7409),
+                                        activeColor: const Color(0xFFF72928),
                                         contentPadding: EdgeInsets.zero,
                                       ),
                                     );
@@ -3517,7 +3517,7 @@ class _WorkoutScheduleSettingsSheetState
                     child: ElevatedButton(
                       onPressed: _saveSchedule,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFFE7409),
+                        backgroundColor: const Color(0xFFF72928),
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -3558,8 +3558,8 @@ class _WorkoutScheduleSettingsSheetState
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: const Color(0xFFFE7409),
-            colorScheme: const ColorScheme.light(primary: Color(0xFFFE7409)),
+            primaryColor: const Color(0xFFF72928),
+            colorScheme: const ColorScheme.light(primary: Color(0xFFF72928)),
           ),
           child: child!,
         );
@@ -3584,7 +3584,7 @@ class _WorkoutScheduleSettingsSheetState
           '✅ Дасгалын хуваарь амжилттай хадгалагдлаа!',
           style: TextStyle(fontWeight: FontWeight.w600),
         ),
-        backgroundColor: const Color(0xFFFE7409),
+        backgroundColor: const Color(0xFFF72928),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),

@@ -94,8 +94,10 @@ class Order extends Equatable {
   final OrderStatus status;
   final DateTime createdAt;
   final DateTime? updatedAt;
+  final DateTime? estimatedDelivery;
   final ShippingAddress shippingAddress;
   final String? notes;
+  final String paymentMethod;
 
   const Order({
     required this.id,
@@ -105,7 +107,9 @@ class Order extends Equatable {
     this.status = OrderStatus.pending,
     required this.createdAt,
     this.updatedAt,
+    this.estimatedDelivery,
     this.notes,
+    this.paymentMethod = 'cash',
   });
 
   int get itemCount => items.fold(0, (sum, item) => sum + item.quantity);
@@ -116,6 +120,26 @@ class Order extends Equatable {
     return '${createdAt.year}/${createdAt.month.toString().padLeft(2, '0')}/${createdAt.day.toString().padLeft(2, '0')}';
   }
 
+  String get formattedEstimatedDelivery {
+    if (estimatedDelivery == null) return 'Тодорхойгүй';
+    return '${estimatedDelivery!.year}/${estimatedDelivery!.month.toString().padLeft(2, '0')}/${estimatedDelivery!.day.toString().padLeft(2, '0')}';
+  }
+
+  String get paymentMethodDisplay {
+    switch (paymentMethod) {
+      case 'cash':
+        return 'Бэлнээр';
+      case 'card':
+        return 'Картаар';
+      case 'qpay':
+        return 'QPay';
+      case 'socialpay':
+        return 'SocialPay';
+      default:
+        return paymentMethod;
+    }
+  }
+
   Order copyWith({
     String? id,
     List<CartItem>? items,
@@ -123,8 +147,10 @@ class Order extends Equatable {
     OrderStatus? status,
     DateTime? createdAt,
     DateTime? updatedAt,
+    DateTime? estimatedDelivery,
     ShippingAddress? shippingAddress,
     String? notes,
+    String? paymentMethod,
   }) {
     return Order(
       id: id ?? this.id,
@@ -133,8 +159,10 @@ class Order extends Equatable {
       status: status ?? this.status,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      estimatedDelivery: estimatedDelivery ?? this.estimatedDelivery,
       shippingAddress: shippingAddress ?? this.shippingAddress,
       notes: notes ?? this.notes,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
     );
   }
 
@@ -146,8 +174,10 @@ class Order extends Equatable {
       'status': status.index,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'estimatedDelivery': estimatedDelivery?.toIso8601String(),
       'shippingAddress': shippingAddress.toJson(),
       'notes': notes,
+      'paymentMethod': paymentMethod,
     };
   }
 
@@ -163,9 +193,13 @@ class Order extends Equatable {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
+      estimatedDelivery: json['estimatedDelivery'] != null
+          ? DateTime.parse(json['estimatedDelivery'] as String)
+          : null,
       shippingAddress:
           ShippingAddress.fromJson(json['shippingAddress'] as Map<String, dynamic>),
       notes: json['notes'] as String?,
+      paymentMethod: json['paymentMethod'] as String? ?? 'cash',
     );
   }
 
@@ -177,7 +211,9 @@ class Order extends Equatable {
         status,
         createdAt,
         updatedAt,
+        estimatedDelivery,
         shippingAddress,
         notes,
+        paymentMethod,
       ];
 }

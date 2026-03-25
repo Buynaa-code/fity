@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import '../domain/entities/cart.dart';
+import '../domain/entities/cart_item.dart';
 import '../domain/entities/order.dart';
 
 enum CartStatus {
@@ -17,6 +18,7 @@ class CartState extends Equatable {
   final String? errorMessage;
   final Order? lastOrder;
   final List<Order> orderHistory;
+  final CartItem? lastRemovedItem; // For undo functionality
 
   const CartState({
     this.cart = const Cart(),
@@ -24,6 +26,7 @@ class CartState extends Equatable {
     this.errorMessage,
     this.lastOrder,
     this.orderHistory = const [],
+    this.lastRemovedItem,
   });
 
   bool get isEmpty => cart.isEmpty;
@@ -31,6 +34,7 @@ class CartState extends Equatable {
   int get itemCount => cart.itemCount;
   double get totalPrice => cart.totalPrice;
   String get formattedTotalPrice => cart.formattedTotalPrice;
+  bool get canUndo => lastRemovedItem != null;
 
   CartState copyWith({
     Cart? cart,
@@ -38,6 +42,7 @@ class CartState extends Equatable {
     String? errorMessage,
     Order? lastOrder,
     List<Order>? orderHistory,
+    CartItem? lastRemovedItem,
   }) {
     return CartState(
       cart: cart ?? this.cart,
@@ -45,9 +50,10 @@ class CartState extends Equatable {
       errorMessage: errorMessage,
       lastOrder: lastOrder ?? this.lastOrder,
       orderHistory: orderHistory ?? this.orderHistory,
+      lastRemovedItem: lastRemovedItem,
     );
   }
 
   @override
-  List<Object?> get props => [cart, status, errorMessage, lastOrder, orderHistory];
+  List<Object?> get props => [cart, status, errorMessage, lastOrder, orderHistory, lastRemovedItem];
 }

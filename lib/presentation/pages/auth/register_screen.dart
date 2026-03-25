@@ -17,7 +17,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _obscureConfirmPassword = true;
   bool _acceptTerms = false;
 
-  static const primaryColor = Color(0xFFFE7409);
+  static const primaryColor = Color(0xFFF72928);
 
   @override
   void dispose() {

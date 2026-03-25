@@ -67,6 +67,46 @@ class _MemberSearchScreenState extends State<MemberSearchScreen> {
   Future<void> _checkInMember(_MockMember member) async {
     HapticFeedback.mediumImpact();
 
+    // Check if member already has an active check-in
+    final existingCheckIn = await CheckInService.instance.getActiveCheckInByUserId(member.id);
+    if (existingCheckIn != null) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.warning_amber_rounded, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${member.name} аль хэдийн check-in хийсэн',
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      const Text(
+                        'Эхлээд check-out хийнэ үү',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.warning,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            ),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(

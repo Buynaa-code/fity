@@ -21,10 +21,10 @@ class FityMaterialApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.orange,
-        primaryColor: const Color(0xFFFE7409),
+        primaryColor: const Color(0xFFF72928),
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFFFE7409),
+          seedColor: const Color(0xFFF72928),
         ),
         fontFamily: 'Rubik',
       ),

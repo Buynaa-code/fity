@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../core/ui/theme/app_colors.dart';
+import '../../../../core/ui/theme/app_typography.dart';
+import '../../../../core/ui/theme/app_spacing.dart';
 
 class WaterQuickAdd extends StatelessWidget {
   final Function(int) onAdd;
@@ -21,21 +24,18 @@ class WaterQuickAdd extends StatelessWidget {
             Icon(
               Icons.add_circle_outline,
               size: 18,
-              color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+              color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textSecondary,
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Text(
               'Түргэн нэмэх',
-              style: TextStyle(
-                fontFamily: 'Rubik',
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDarkMode ? Colors.white : Colors.grey.shade800,
+              style: AppTypography.titleLarge.copyWith(
+                color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.md),
         Row(
           children: [
             _QuickAddButton(
@@ -43,31 +43,31 @@ class WaterQuickAdd extends StatelessWidget {
               label: '150мл',
               subtitle: 'Аяга',
               amount: 150,
-              color: const Color(0xFF8B4513),
+              color: const Color(0xFF8B4513), // Coffee brown - unique to this context
               onTap: () => onAdd(150),
               isDarkMode: isDarkMode,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             _QuickAddButton(
               icon: Icons.water_drop_outlined,
               label: '250мл',
               subtitle: 'Стакан',
               amount: 250,
-              color: const Color(0xFF3498DB),
+              color: AppColors.water,
               onTap: () => onAdd(250),
               isDarkMode: isDarkMode,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             _QuickAddButton(
               icon: Icons.local_drink_outlined,
               label: '500мл',
               subtitle: 'Лонх',
               amount: 500,
-              color: const Color(0xFF2ECC71),
+              color: AppColors.success,
               onTap: () => onAdd(500),
               isDarkMode: isDarkMode,
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppSpacing.sm),
             _CustomAddButton(
               onAdd: onAdd,
               isDarkMode: isDarkMode,
@@ -166,7 +166,7 @@ class _QuickAddButtonState extends State<_QuickAddButton>
                         ? [widget.color.withValues(alpha: 0.25), widget.color.withValues(alpha: 0.15)]
                         : [widget.color.withValues(alpha: 0.15), widget.color.withValues(alpha: 0.08)],
                   ),
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   border: Border.all(
                     color: _isPressed
                         ? widget.color.withValues(alpha: 0.5)
@@ -186,7 +186,7 @@ class _QuickAddButtonState extends State<_QuickAddButton>
                 child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(AppSpacing.sm),
                       decoration: BoxDecoration(
                         color: widget.color.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
@@ -197,27 +197,24 @@ class _QuickAddButtonState extends State<_QuickAddButton>
                         size: 20,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       widget.label,
-                      style: TextStyle(
-                        fontFamily: 'Rubik',
-                        fontSize: 13,
+                      style: AppTypography.labelMedium.copyWith(
                         fontWeight: FontWeight.w700,
                         color: widget.isDarkMode
-                            ? Colors.white
+                            ? AppColors.darkTextPrimary
                             : widget.color.withValues(alpha: 0.9),
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       widget.subtitle,
-                      style: TextStyle(
-                        fontFamily: 'Rubik',
+                      style: AppTypography.labelSmall.copyWith(
                         fontSize: 10,
                         color: widget.isDarkMode
-                            ? Colors.grey.shade400
-                            : Colors.grey.shade600,
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textTertiary,
                       ),
                     ),
                   ],
@@ -302,55 +299,52 @@ class _CustomAddButtonState extends State<_CustomAddButton>
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 decoration: BoxDecoration(
                   color: widget.isDarkMode
-                      ? (_isPressed ? Colors.grey.shade700 : Colors.grey.shade800)
-                      : (_isPressed ? Colors.grey.shade200 : Colors.grey.shade100),
-                  borderRadius: BorderRadius.circular(16),
+                      ? (_isPressed ? AppColors.darkSurfaceVariant : AppColors.darkSurface)
+                      : (_isPressed ? AppColors.surfaceVariant : AppColors.surface),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   border: Border.all(
                     color: widget.isDarkMode
-                        ? Colors.grey.shade600
-                        : Colors.grey.shade300,
+                        ? AppColors.darkBorder
+                        : AppColors.border,
                     width: _isPressed ? 2 : 1,
                   ),
                 ),
                 child: Column(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(AppSpacing.sm),
                       decoration: BoxDecoration(
                         color: widget.isDarkMode
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade200,
+                            ? AppColors.darkSurfaceVariant
+                            : AppColors.surfaceVariant,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.add,
                         color: widget.isDarkMode
-                            ? Colors.grey.shade300
-                            : Colors.grey.shade700,
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                         size: 20,
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       'Бусад',
-                      style: TextStyle(
-                        fontFamily: 'Rubik',
-                        fontSize: 13,
+                      style: AppTypography.labelMedium.copyWith(
                         fontWeight: FontWeight.w700,
                         color: widget.isDarkMode
-                            ? Colors.grey.shade300
-                            : Colors.grey.shade700,
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textSecondary,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       'Өөрөө',
-                      style: TextStyle(
-                        fontFamily: 'Rubik',
+                      style: AppTypography.labelSmall.copyWith(
                         fontSize: 10,
                         color: widget.isDarkMode
-                            ? Colors.grey.shade500
-                            : Colors.grey.shade500,
+                            ? AppColors.darkTextSecondary
+                            : AppColors.textTertiary,
                       ),
                     ),
                   ],
@@ -370,29 +364,30 @@ class _CustomAddButtonState extends State<_CustomAddButton>
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: widget.isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: widget.isDarkMode ? AppColors.darkSurface : AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        ),
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: const Color(0xFF3498DB).withValues(alpha: 0.15),
+                color: AppColors.water.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.water_drop,
-                color: Color(0xFF3498DB),
+                color: AppColors.water,
                 size: 20,
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Text(
               'Усны хэмжээ',
-              style: TextStyle(
-                fontFamily: 'Rubik',
+              style: AppTypography.titleLarge.copyWith(
                 fontWeight: FontWeight.w700,
-                color: widget.isDarkMode ? Colors.white : Colors.black87,
+                color: widget.isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
             ),
           ],
@@ -406,46 +401,41 @@ class _CustomAddButtonState extends State<_CustomAddButton>
                 controller: controller,
                 keyboardType: TextInputType.number,
                 autofocus: true,
-                style: TextStyle(
-                  fontFamily: 'Rubik',
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: widget.isDarkMode ? Colors.white : Colors.black87,
+                style: AppTypography.numberSmall.copyWith(
+                  color: widget.isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
                 ),
                 decoration: InputDecoration(
                   hintText: '0',
                   hintStyle: TextStyle(
                     color: widget.isDarkMode
-                        ? Colors.grey.shade600
-                        : Colors.grey.shade400,
+                        ? AppColors.darkTextSecondary
+                        : AppColors.disabled,
                   ),
                   suffixText: 'мл',
-                  suffixStyle: TextStyle(
-                    fontFamily: 'Rubik',
-                    fontSize: 16,
+                  suffixStyle: AppTypography.bodyMedium.copyWith(
                     color: widget.isDarkMode
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
+                        ? AppColors.darkTextSecondary
+                        : AppColors.textSecondary,
                   ),
                   filled: true,
                   fillColor: widget.isDarkMode
-                      ? Colors.grey.shade800
-                      : Colors.grey.shade100,
+                      ? AppColors.darkSurfaceVariant
+                      : AppColors.surfaceVariant,
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     borderSide: BorderSide.none,
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     borderSide: const BorderSide(
-                      color: Color(0xFF3498DB),
+                      color: AppColors.water,
                       width: 2,
                     ),
                   ),
                   errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     borderSide: const BorderSide(
-                      color: Colors.red,
+                      color: AppColors.error,
                       width: 2,
                     ),
                   ),
@@ -467,11 +457,11 @@ class _CustomAddButtonState extends State<_CustomAddButton>
                   return null;
                 },
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.md),
               // Quick presets
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: AppSpacing.sm,
+                runSpacing: AppSpacing.sm,
                 children: [100, 200, 300, 400, 750, 1000].map((amount) {
                   return GestureDetector(
                     onTap: () {
@@ -480,29 +470,27 @@ class _CustomAddButtonState extends State<_CustomAddButton>
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 6,
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
                         color: widget.isDarkMode
-                            ? Colors.grey.shade800
-                            : Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(8),
+                            ? AppColors.darkSurfaceVariant
+                            : AppColors.surfaceVariant,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                         border: Border.all(
                           color: widget.isDarkMode
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade300,
+                              ? AppColors.darkBorder
+                              : AppColors.border,
                         ),
                       ),
                       child: Text(
-                        '${amount}мл',
-                        style: TextStyle(
-                          fontFamily: 'Rubik',
-                          fontSize: 12,
+                        '$amountмл',
+                        style: AppTypography.labelSmall.copyWith(
                           fontWeight: FontWeight.w500,
                           color: widget.isDarkMode
-                              ? Colors.grey.shade300
-                              : Colors.grey.shade700,
+                              ? AppColors.darkTextSecondary
+                              : AppColors.textSecondary,
                         ),
                       ),
                     ),
@@ -517,11 +505,10 @@ class _CustomAddButtonState extends State<_CustomAddButton>
             onPressed: () => Navigator.pop(ctx),
             child: Text(
               'Цуцлах',
-              style: TextStyle(
-                fontFamily: 'Rubik',
+              style: AppTypography.labelLarge.copyWith(
                 color: widget.isDarkMode
-                    ? Colors.grey.shade400
-                    : Colors.grey.shade600,
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary,
               ),
             ),
           ),
@@ -535,17 +522,20 @@ class _CustomAddButtonState extends State<_CustomAddButton>
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF3498DB),
-              foregroundColor: Colors.white,
+              backgroundColor: AppColors.water,
+              foregroundColor: AppColors.white,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.md,
+              ),
             ),
-            child: const Text(
+            child: Text(
               'Нэмэх',
-              style: TextStyle(
-                fontFamily: 'Rubik',
+              style: AppTypography.labelLarge.copyWith(
+                color: AppColors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),

@@ -954,7 +954,7 @@ class _WorkoutListScreenState extends State<WorkoutListScreen>
   Color _getCategoryColor(String category) {
     switch (category) {
       case 'Хүч чадал':
-        return const Color(0xFFFE7409);
+        return const Color(0xFFF72928);
       case 'Хөл':
         return const Color(0xFF9B59B6);
       case 'Гэдэс':
@@ -1204,7 +1204,7 @@ class _ExerciseDetailSheet extends StatelessWidget {
                         height: 60,
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
-                            colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+                            colors: [Color(0xFFF72928), Color(0xFFFF9149)],
                           ),
                           borderRadius: BorderRadius.circular(18),
                         ),
@@ -1316,7 +1316,7 @@ class _ExerciseDetailSheet extends StatelessWidget {
                           width: 28,
                           height: 28,
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFE7409),
+                            color: const Color(0xFFF72928),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Center(
@@ -1352,12 +1352,12 @@ class _ExerciseDetailSheet extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(vertical: 18),
                       decoration: BoxDecoration(
                         gradient: const LinearGradient(
-                          colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+                          colors: [Color(0xFFF72928), Color(0xFFFF9149)],
                         ),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFFFE7409).withValues(alpha: 0.4),
+                            color: const Color(0xFFF72928).withValues(alpha: 0.4),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),

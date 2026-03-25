@@ -257,7 +257,7 @@ class AppTheme {
         activeTrackColor: BrandColors.primary,
         inactiveTrackColor: BrandColors.surfaceVariant,
         thumbColor: BrandColors.primary,
-        overlayColor: Color(0x29FE7409),
+        overlayColor: Color(0x29F72928),
       ),
 
       // Divider
@@ -526,7 +526,7 @@ class AppTheme {
         activeTrackColor: BrandColors.primary,
         inactiveTrackColor: BrandColors.darkSurfaceVariant,
         thumbColor: BrandColors.primary,
-        overlayColor: Color(0x29FE7409),
+        overlayColor: Color(0x29F72928),
       ),
 
       // Divider

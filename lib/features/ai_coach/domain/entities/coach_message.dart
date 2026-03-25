@@ -37,7 +37,7 @@ class CoachMessage {
       case MessageType.user:
         return const Color(0xFF6C5CE7);
       case MessageType.coach:
-        return const Color(0xFFFE7409);
+        return const Color(0xFFF72928);
       case MessageType.tip:
         return const Color(0xFF3498DB);
       case MessageType.workout:

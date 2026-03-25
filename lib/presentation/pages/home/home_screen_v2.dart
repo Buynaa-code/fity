@@ -21,6 +21,7 @@ import '../../../features/gamification/presentation/bloc/badge_event.dart';
 import '../../../features/gamification/presentation/bloc/badge_state.dart';
 import '../../../features/trainer_marketplace/presentation/pages/trainer_list_screen.dart';
 import '../../../features/ai_coach/presentation/pages/ai_coach_screen.dart';
+import '../../../features/supplement_shop/presentation/screens/product_list_screen.dart';
 import '../../../features/user/presentation/bloc/user_bloc.dart';
 import '../../../features/user/presentation/bloc/user_state.dart';
 import '../../../features/user/domain/enums/user_role.dart';
@@ -123,11 +124,11 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
         return Theme(
           data: _isDarkMode
               ? ThemeData.dark().copyWith(
-                  primaryColor: const Color(0xFFFE7409),
+                  primaryColor: const Color(0xFFF72928),
                   scaffoldBackgroundColor: const Color(0xFF0D0D0D),
                 )
               : ThemeData.light().copyWith(
-                  primaryColor: const Color(0xFFFE7409),
+                  primaryColor: const Color(0xFFF72928),
                   scaffoldBackgroundColor: const Color(0xFFF5F5F5),
                 ),
           child: Scaffold(
@@ -154,11 +155,11 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
         gradient: const LinearGradient(
-          colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
+          colors: [Color(0xFFF72928), Color(0xFFFF9149)],
         ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFFE7409).withValues(alpha: 0.4),
+            color: const Color(0xFFF72928).withValues(alpha: 0.4),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -257,7 +258,7 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? const Color(0xFFFE7409).withValues(alpha: 0.15)
+              ? const Color(0xFFF72928).withValues(alpha: 0.15)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
@@ -267,7 +268,7 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
             Icon(
               isSelected ? activeIcon : inactiveIcon,
               color: isSelected
-                  ? const Color(0xFFFE7409)
+                  ? const Color(0xFFF72928)
                   : (_isDarkMode ? Colors.grey[500] : Colors.grey[600]),
               size: 24,
             ),
@@ -278,7 +279,7 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
                 fontSize: 11,
                 fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                 color: isSelected
-                    ? const Color(0xFFFE7409)
+                    ? const Color(0xFFF72928)
                     : (_isDarkMode ? Colors.grey[500] : Colors.grey[600]),
               ),
             ),
@@ -307,7 +308,7 @@ class _HomeContent extends StatelessWidget {
         onRefresh();
         await Future.delayed(const Duration(milliseconds: 500));
       },
-      color: const Color(0xFFFE7409),
+      color: const Color(0xFFF72928),
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(
           parent: BouncingScrollPhysics(),
@@ -445,7 +446,7 @@ class _HomeContent extends StatelessWidget {
                                 id: 'checkin',
                                 title: 'Check-In',
                                 icon: Icons.qr_code_rounded,
-                                color: const Color(0xFFFE7409),
+                                color: const Color(0xFFF72928),
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (_) => const UserQRCodeScreen()),
@@ -499,6 +500,17 @@ class _HomeContent extends StatelessWidget {
                                 onTap: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(builder: (_) => const TrainerListScreen()),
+                                ),
+                                priority: ActionPriority.normal,
+                              ),
+                              QuickAction(
+                                id: 'shop',
+                                title: 'Дэлгүүр',
+                                icon: Icons.shopping_bag_rounded,
+                                color: const Color(0xFFE91E63),
+                                onTap: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (_) => const ProductListScreen()),
                                 ),
                                 priority: ActionPriority.normal,
                               ),

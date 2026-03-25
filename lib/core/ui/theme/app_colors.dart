@@ -11,9 +11,9 @@ export '../../branding/brand_config.dart' show BrandColors, BrandGradients, Bran
 /// Purple: Premium features, streaks - Motivation, ambition
 class AppColors {
   // Primary colors
-  static const Color primary = Color(0xFFFE7409);
-  static const Color primaryLight = Color(0xFFFF9500);
-  static const Color primaryDark = Color(0xFFE56607);
+  static const Color primary = Color(0xFFF72928);
+  static const Color primaryLight = Color(0xFFFF5A59);
+  static const Color primaryDark = Color(0xFF911817);
 
   // Secondary colors
   static const Color secondary = Color(0xFF6C5CE7);
@@ -53,7 +53,7 @@ class AppColors {
   static const Color darkTextSecondary = Color(0xFFB3B3B3);
 
   // Gamification colors
-  static const Color streak = Color(0xFFFF6B35);
+  static const Color streak = Color(0xFFF72928);
   static const Color badge = Color(0xFFFFD700);
   static const Color achievement = Color(0xFF9B59B6);
   static const Color levelUp = Color(0xFF1ABC9C);
@@ -82,7 +82,7 @@ class AppColors {
   );
 
   static const LinearGradient streakGradient = LinearGradient(
-    colors: [Color(0xFFFF6B35), Color(0xFFFFAB40)],
+    colors: [Color(0xFFF72928), Color(0xFFFF5A59)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );

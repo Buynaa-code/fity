@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/ui/theme/app_colors.dart';
+import '../../../../core/ui/theme/app_typography.dart';
+import '../../../../core/ui/theme/app_spacing.dart';
 
 class WeeklyProgressChart extends StatelessWidget {
   final List<int> weeklyWorkouts; // 7 days of workout counts
@@ -20,18 +23,18 @@ class WeeklyProgressChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final today = DateTime.now().weekday - 1; // 0 = Monday
     final maxCalories = weeklyCalories.isEmpty
-        ? 500
+        ? 500.0
         : weeklyCalories.reduce((a, b) => a > b ? a : b);
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.screenPadding),
+      padding: const EdgeInsets.all(AppSpacing.screenPadding),
       decoration: BoxDecoration(
-        color: isDarkMode ? const Color(0xFF1E1E1E) : Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: isDarkMode ? AppColors.darkSurface : AppColors.surface,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         boxShadow: [
           BoxShadow(
-            color: (isDarkMode ? Colors.black : Colors.grey).withValues(alpha: 0.1),
+            color: (isDarkMode ? Colors.black : AppColors.textSecondary).withValues(alpha: 0.1),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -40,48 +43,53 @@ class WeeklyProgressChart extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Долоо хоногийн тойм',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: isDarkMode ? Colors.white : Colors.black87,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Долоо хоногийн тойм',
+                      style: AppTypography.titleLarge.copyWith(
+                        color: isDarkMode ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${weeklyWorkouts.where((w) => w > 0).length}/7 өдөр идэвхтэй',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      '${weeklyWorkouts.where((w) => w > 0).length}/7 өдөр идэвхтэй',
+                      style: AppTypography.bodySmall.copyWith(
+                        color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
+                  gradient: AppColors.primaryGradient,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
                 child: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 16),
-                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.local_fire_department_rounded,
+                      color: AppColors.white,
+                      size: 16,
+                    ),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       '$currentStreak',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: AppTypography.labelLarge.copyWith(
+                        color: AppColors.white,
                         fontWeight: FontWeight.w700,
-                        fontSize: 14,
                       ),
                     ),
                   ],
@@ -90,72 +98,77 @@ class WeeklyProgressChart extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: AppSpacing.lg),
 
-          // Bar chart
+          // Bar chart - Fixed overflow by using LayoutBuilder and Flexible
           SizedBox(
-            height: 120,
+            height: 140, // Increased height to accommodate all elements
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: List.generate(7, (index) {
                 final isToday = index == today;
                 final hasWorkout = weeklyWorkouts.length > index && weeklyWorkouts[index] > 0;
-                final calories = weeklyCalories.length > index ? weeklyCalories[index] : 0;
+                final calories = weeklyCalories.length > index ? weeklyCalories[index] : 0.0;
+
+                // Calculate bar height - reserve space for indicator (20px), spacing (8px), label (18px)
+                // Available for bar: 140 - 20 - 8 - 18 = 94px max
+                const maxBarHeight = 90.0;
+                const minBarHeight = 8.0;
                 final barHeight = maxCalories > 0
-                    ? (calories / maxCalories * 80).clamp(8.0, 80.0)
-                    : 8.0;
+                    ? (calories / maxCalories * maxBarHeight).clamp(minBarHeight, maxBarHeight)
+                    : minBarHeight;
 
                 return Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Workout indicator
-                        if (hasWorkout)
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 4),
-                            child: Icon(
-                              Icons.check_circle_rounded,
-                              color: Colors.green,
-                              size: 16,
-                            ),
-                          ),
+                        // Workout indicator - use SizedBox to reserve consistent space
+                        SizedBox(
+                          height: 20,
+                          child: hasWorkout
+                              ? const Icon(
+                                  Icons.check_circle_rounded,
+                                  color: AppColors.success,
+                                  size: 16,
+                                )
+                              : null,
+                        ),
 
                         // Bar
                         AnimatedContainer(
                           duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutCubic,
                           height: barHeight,
                           decoration: BoxDecoration(
                             gradient: isToday
-                                ? const LinearGradient(
-                                    begin: Alignment.bottomCenter,
-                                    end: Alignment.topCenter,
-                                    colors: [Color(0xFFFE7409), Color(0xFFFF9149)],
-                                  )
+                                ? AppColors.primaryGradient
                                 : LinearGradient(
                                     begin: Alignment.bottomCenter,
                                     end: Alignment.topCenter,
                                     colors: hasWorkout
-                                        ? [Colors.green.shade400, Colors.green.shade300]
-                                        : [Colors.grey.shade300, Colors.grey.shade200],
+                                        ? [AppColors.success, AppColors.success.withValues(alpha: 0.7)]
+                                        : isDarkMode
+                                            ? [AppColors.darkBorder, AppColors.darkSurfaceVariant]
+                                            : [AppColors.border, AppColors.surfaceVariant],
                                   ),
-                            borderRadius: BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                           ),
                         ),
 
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
 
                         // Day label
                         Text(
                           _dayLabels[index],
-                          style: TextStyle(
-                            fontSize: 11,
+                          style: AppTypography.labelSmall.copyWith(
                             fontWeight: isToday ? FontWeight.w700 : FontWeight.w500,
                             color: isToday
-                                ? const Color(0xFFFE7409)
-                                : (isDarkMode ? Colors.grey[500] : Colors.grey[600]),
+                                ? AppColors.primary
+                                : (isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary),
                           ),
                         ),
                       ],
@@ -166,15 +179,15 @@ class WeeklyProgressChart extends StatelessWidget {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.md),
 
           // Legend
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegendItem(Colors.green, 'Дасгал хийсэн'),
-              const SizedBox(width: 20),
-              _buildLegendItem(const Color(0xFFFE7409), 'Өнөөдөр'),
+              _buildLegendItem(AppColors.success, 'Дасгал хийсэн'),
+              const SizedBox(width: AppSpacing.lg),
+              _buildLegendItem(AppColors.primary, 'Өнөөдөр'),
             ],
           ),
         ],
@@ -184,6 +197,7 @@ class WeeklyProgressChart extends StatelessWidget {
 
   Widget _buildLegendItem(Color color, String label) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
           width: 10,
@@ -193,12 +207,11 @@ class WeeklyProgressChart extends StatelessWidget {
             borderRadius: BorderRadius.circular(3),
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: AppSpacing.xs),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 11,
-            color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
+          style: AppTypography.labelSmall.copyWith(
+            color: isDarkMode ? AppColors.darkTextSecondary : AppColors.textTertiary,
           ),
         ),
       ],

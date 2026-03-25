@@ -15,7 +15,7 @@ class OrderSuccessScreen extends StatefulWidget {
 
 class _OrderSuccessScreenState extends State<OrderSuccessScreen>
     with SingleTickerProviderStateMixin {
-  static const Color primaryColor = Color(0xFFFE7409);
+  static const Color primaryColor = Color(0xFFF72928);
 
   late final AnimationController _animationController;
   late final Animation<double> _scaleAnimation;

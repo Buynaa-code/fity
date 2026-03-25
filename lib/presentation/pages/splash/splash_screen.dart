@@ -50,7 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
       const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
         statusBarIconBrightness: Brightness.light,
-        systemNavigationBarColor: Color(0xFFFE7409),
+        systemNavigationBarColor: Color(0xFFF72928),
         systemNavigationBarIconBrightness: Brightness.light,
       ),
     );

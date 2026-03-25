@@ -11,7 +11,7 @@ class OrderHistoryScreen extends StatefulWidget {
 }
 
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
-  static const Color primaryColor = Color(0xFFFE7409);
+  static const Color primaryColor = Color(0xFFF72928);
   static const String _ordersKey = 'supplement_orders';
 
   List<Order> _orders = [];
@@ -167,7 +167,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 class _OrderCard extends StatelessWidget {
   final Order order;
 
-  static const Color primaryColor = Color(0xFFFE7409);
+  static const Color primaryColor = Color(0xFFF72928);
 
   const _OrderCard({required this.order});
 

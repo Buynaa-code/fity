@@ -188,10 +188,10 @@ class _QRScannerScreenState extends State<QRScannerScreen>
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFE7409).withOpacity(0.1),
+                            color: const Color(0xFFF72928).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(20),
                             border: Border.all(
-                              color: const Color(0xFFFE7409).withOpacity(0.3),
+                              color: const Color(0xFFF72928).withOpacity(0.3),
                               width: 2,
                             ),
                           ),
@@ -201,7 +201,7 @@ class _QRScannerScreenState extends State<QRScannerScreen>
                                 isScanning 
                                     ? FontAwesomeIcons.qrcode 
                                     : FontAwesomeIcons.check,
-                                color: const Color(0xFFFE7409),
+                                color: const Color(0xFFF72928),
                                 size: 32,
                               ),
                               const SizedBox(height: 8),
@@ -276,12 +276,12 @@ class _QRScannerScreenState extends State<QRScannerScreen>
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFFE7409).withOpacity(0.1),
+                color: const Color(0xFFF72928).withOpacity(0.1),
                 borderRadius: BorderRadius.circular(50),
               ),
               child: const Icon(
                 Icons.check_circle,
-                color: Color(0xFFFE7409),
+                color: Color(0xFFF72928),
                 size: 48,
               ),
             ),
@@ -319,7 +319,7 @@ class _QRScannerScreenState extends State<QRScannerScreen>
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFFE7409),
+                color: const Color(0xFFF72928),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Text(
@@ -375,7 +375,7 @@ class QROverlayPainter extends CustomPainter {
 
     // Draw scan area border
     final borderPaint = Paint()
-      ..color = const Color(0xFFFE7409)
+      ..color = const Color(0xFFF72928)
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
 
@@ -386,7 +386,7 @@ class QROverlayPainter extends CustomPainter {
 
     // Animated scanline
     final scanlinePaint = Paint()
-      ..color = const Color(0xFFFE7409).withOpacity(0.8)
+      ..color = const Color(0xFFF72928).withOpacity(0.8)
       ..strokeWidth = 2;
 
     final scanlineY = scanRect.top + (scanRect.height * scanlineAnimation.value);
@@ -399,7 +399,7 @@ class QROverlayPainter extends CustomPainter {
 
     // Corner indicators
     final cornerPaint = Paint()
-      ..color = const Color(0xFFFE7409)
+      ..color = const Color(0xFFF72928)
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke
       ..strokeCap = StrokeCap.round;

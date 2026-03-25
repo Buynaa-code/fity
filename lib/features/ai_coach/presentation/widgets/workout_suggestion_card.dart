@@ -52,8 +52,8 @@ class WorkoutSuggestionCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        const Color(0xFFFE7409),
-                        const Color(0xFFFE7409).withValues(alpha: 0.7),
+                        const Color(0xFFF72928),
+                        const Color(0xFFF72928).withValues(alpha: 0.7),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(12),
