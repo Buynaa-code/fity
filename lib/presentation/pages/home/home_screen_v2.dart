@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../checkin/user_qr_code_screen.dart';
 import '../workout/workout_list_screen.dart';
 import '../health/calorie_screen.dart';
-import '../challenges/challenges_screen.dart';
 import '../profile/profile_screen.dart';
 import '../receptionist/receptionist_scanner_screen.dart';
 import '../receptionist/checkins_list_screen.dart';
@@ -25,6 +24,8 @@ import '../../../features/supplement_shop/presentation/screens/product_list_scre
 import '../../../features/user/presentation/bloc/user_bloc.dart';
 import '../../../features/user/presentation/bloc/user_state.dart';
 import '../../../features/user/domain/enums/user_role.dart';
+import '../../../features/marathon/presentation/pages/member/marathon_list_screen.dart';
+import '../../../features/marathon/presentation/pages/coach/coach_dashboard_screen.dart';
 
 import 'widgets/home_header.dart';
 import 'widgets/today_stats_card.dart';
@@ -92,7 +93,7 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
       ),
       const WorkoutListScreen(),
       const CalorieScreen(),
-      const ChallengesScreen(),
+      const MarathonListScreen(),
       const ProfileScreen(),
     ];
   }
@@ -104,6 +105,36 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
       const MemberSearchScreen(),
       const ProfileScreen(),
     ];
+  }
+
+  List<Widget> _getCoachScreens() {
+    return [
+      const CoachDashboardScreen(),
+      const MarathonListScreen(),
+      const ProfileScreen(),
+    ];
+  }
+
+  List<Widget> _getScreensForRole(UserRole role) {
+    switch (role) {
+      case UserRole.coach:
+        return _getCoachScreens();
+      case UserRole.receptionist:
+        return _getReceptionistScreens();
+      default:
+        return _getMemberScreens();
+    }
+  }
+
+  Widget? _getBottomNavForRole(UserRole role) {
+    switch (role) {
+      case UserRole.coach:
+        return _buildCoachBottomNav();
+      case UserRole.receptionist:
+        return _buildReceptionistBottomNav();
+      default:
+        return _buildMemberBottomNav();
+    }
   }
 
   @override
@@ -118,8 +149,7 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
         }
         _previousRole = role;
 
-        final isMember = role == UserRole.member;
-        final screens = isMember ? _getMemberScreens() : _getReceptionistScreens();
+        final screens = _getScreensForRole(role);
 
         return Theme(
           data: _isDarkMode
@@ -136,14 +166,14 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
               index: _currentIndex,
               children: screens,
             ),
-            floatingActionButton: isMember && _currentIndex == 0
+            floatingActionButton: role == UserRole.member && _currentIndex == 0
                 ? ScaleTransition(
                     scale: _fabAnimation,
                     child: _buildQRFab(),
                   )
                 : null,
             floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-            bottomNavigationBar: isMember ? _buildMemberBottomNav() : _buildReceptionistBottomNav(),
+            bottomNavigationBar: _getBottomNavForRole(role),
           ),
         );
       },
@@ -234,6 +264,35 @@ class _HomeScreenV2State extends State<HomeScreenV2> with TickerProviderStateMix
               _buildNavItem(1, Icons.fact_check_rounded, Icons.fact_check_outlined, 'Check-ins'),
               _buildNavItem(2, Icons.people_rounded, Icons.people_outlined, 'Гишүүд'),
               _buildNavItem(3, Icons.person_rounded, Icons.person_outline_rounded, 'Профайл'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoachBottomNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: _isDarkMode ? const Color(0xFF1A1A1A) : Colors.white,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, Icons.dashboard_rounded, Icons.dashboard_outlined, 'Хянах самбар'),
+              _buildNavItem(1, Icons.directions_run_rounded, Icons.directions_run_outlined, 'Ангиуд'),
+              _buildNavItem(2, Icons.person_rounded, Icons.person_outline_rounded, 'Профайл'),
             ],
           ),
         ),

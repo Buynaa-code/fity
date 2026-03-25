@@ -12,6 +12,8 @@ import 'features/health/presentation/bloc/health_bloc.dart';
 import 'features/health/presentation/bloc/health_event.dart';
 import 'features/user/presentation/bloc/user_bloc.dart';
 import 'features/user/presentation/bloc/user_event.dart';
+import 'features/marathon/presentation/bloc/marathon_bloc.dart';
+import 'features/marathon/presentation/bloc/marathon_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,6 +42,9 @@ class FityApp extends StatelessWidget {
         ),
         BlocProvider<UserBloc>(
           create: (context) => di.sl<UserBloc>()..add(const LoadUser()),
+        ),
+        BlocProvider<MarathonBloc>(
+          create: (context) => di.sl<MarathonBloc>()..add(const LoadClasses()),
         ),
       ],
       child: const FityMaterialApp(),

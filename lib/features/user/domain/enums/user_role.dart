@@ -2,6 +2,7 @@ enum UserRole {
   member,
   receptionist,
   trainer,
+  coach,
   admin;
 
   String get displayName {
@@ -12,6 +13,8 @@ enum UserRole {
         return 'Ресепшн';
       case UserRole.trainer:
         return 'Дасгалжуулагч';
+      case UserRole.coach:
+        return 'Марафон багш';
       case UserRole.admin:
         return 'Админ';
     }
@@ -23,6 +26,8 @@ enum UserRole {
         return UserRole.receptionist;
       case 'trainer':
         return UserRole.trainer;
+      case 'coach':
+        return UserRole.coach;
       case 'admin':
         return UserRole.admin;
       default:

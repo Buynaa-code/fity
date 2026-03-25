@@ -1216,7 +1216,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                         UserRole.member,
                         Icons.person_rounded,
                         'Гишүүн',
-                        'QR код, дасгал, статистик',
+                        'QR код, дасгал, марафон анги',
+                        state.role,
+                      ),
+                      _buildRoleOption(
+                        context,
+                        UserRole.coach,
+                        Icons.school_rounded,
+                        'Марафон багш',
+                        'Анги үүсгэх, оролцогчид, ирц',
                         state.role,
                       ),
                       _buildRoleOption(

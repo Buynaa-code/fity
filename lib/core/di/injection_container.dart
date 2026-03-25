@@ -27,6 +27,10 @@ import '../../features/health/presentation/bloc/health_bloc.dart';
 import '../services/user_preferences_service.dart';
 import '../../features/user/presentation/bloc/user_bloc.dart';
 
+// Marathon
+import '../../features/marathon/data/repositories/marathon_repository.dart';
+import '../../features/marathon/presentation/bloc/marathon_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -105,5 +109,16 @@ Future<void> init() async {
   // BLoC
   sl.registerFactory(
     () => UserBloc(prefs: sl()),
+  );
+
+  // === Marathon Feature ===
+  // Repositories
+  sl.registerLazySingleton<MarathonRepository>(
+    () => MarathonRepository(sl()),
+  );
+
+  // BLoC
+  sl.registerFactory(
+    () => MarathonBloc(sl()),
   );
 }
