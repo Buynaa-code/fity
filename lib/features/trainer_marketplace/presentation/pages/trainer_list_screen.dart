@@ -8,6 +8,7 @@ import '../widgets/trainer_card.dart';
 import '../widgets/specialty_chip.dart';
 import 'trainer_detail_screen.dart';
 import 'booking_history_screen.dart';
+import 'trainer_registration_screen.dart';
 
 class TrainerListScreen extends StatelessWidget {
   const TrainerListScreen({super.key});
@@ -167,6 +168,49 @@ class _TrainerListViewState extends State<_TrainerListView> {
               ],
             ),
           ),
+          // Become a trainer button
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const TrainerRegistrationScreen(
+                    userId: 'current_user',
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFF72928), Color(0xFFFF9149)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.fitness_center,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                  SizedBox(width: 6),
+                  Text(
+                    'Бүртгүүлэх',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Booking history button
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -564,41 +608,44 @@ class _FeaturedTrainerCard extends StatelessWidget {
                 ),
               ],
             ),
-            // Info
-            Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    trainer.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+            // Info - use Expanded to prevent overflow
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      trainer.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    trainer.specialties.take(2).join(', '),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: BrandColors.textSecondary,
+                    const SizedBox(height: 2),
+                    Text(
+                      trainer.specialties.take(2).join(', '),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: BrandColors.textSecondary,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    '₮${_formatPrice(trainer.hourlyRate)}/цаг',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: BrandColors.primary,
+                    const Spacer(),
+                    Text(
+                      '₮${_formatPrice(trainer.hourlyRate)}/цаг',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: BrandColors.primary,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
