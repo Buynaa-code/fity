@@ -33,6 +33,8 @@ import 'widgets/quick_actions_section.dart';
 import 'widgets/active_workout_card.dart';
 import 'widgets/weekly_progress_chart.dart';
 import 'widgets/gym_occupancy_card.dart';
+import 'widgets/motivation_carousel.dart';
+import 'widgets/featured_trainers_carousel.dart';
 
 class HomeScreenV2 extends StatefulWidget {
   const HomeScreenV2({super.key});
@@ -402,6 +404,26 @@ class _HomeContent extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(top: 20),
               child: GymOccupancyCard(
+                isDarkMode: isDarkMode,
+              ),
+            ),
+          ),
+
+          // Daily Motivation Carousel
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: MotivationCarousel(
+                isDarkMode: isDarkMode,
+              ),
+            ),
+          ),
+
+          // Featured Trainers Carousel
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: FeaturedTrainersCarousel(
                 isDarkMode: isDarkMode,
               ),
             ),

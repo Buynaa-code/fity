@@ -1,4 +1,5 @@
 import '../../domain/entities/marathon_enrollment.dart';
+import '../../domain/entities/marathon_milestone.dart';
 
 class MarathonEnrollmentModel extends MarathonEnrollment {
   const MarathonEnrollmentModel({
@@ -10,9 +11,24 @@ class MarathonEnrollmentModel extends MarathonEnrollment {
     required super.enrolledAt,
     super.totalAttendance,
     super.status,
+    super.currentStreak,
+    super.longestStreak,
+    super.lastAttendedAt,
+    super.unlockedMilestones,
   });
 
   factory MarathonEnrollmentModel.fromJson(Map<String, dynamic> json) {
+    // Parse unlocked milestones from JSON
+    List<MilestoneType> unlockedMilestones = [];
+    if (json['unlocked_milestones'] != null) {
+      unlockedMilestones = (json['unlocked_milestones'] as List<dynamic>)
+          .map((e) => MilestoneType.values.firstWhere(
+                (m) => m.name == e,
+                orElse: () => MilestoneType.attendance7,
+              ))
+          .toList();
+    }
+
     return MarathonEnrollmentModel(
       id: json['id'] as String,
       classId: json['class_id'] as String,
@@ -25,6 +41,12 @@ class MarathonEnrollmentModel extends MarathonEnrollment {
         (e) => e.name == json['status'],
         orElse: () => EnrollmentStatus.active,
       ),
+      currentStreak: json['current_streak'] as int? ?? 0,
+      longestStreak: json['longest_streak'] as int? ?? 0,
+      lastAttendedAt: json['last_attended_at'] != null
+          ? DateTime.parse(json['last_attended_at'] as String)
+          : null,
+      unlockedMilestones: unlockedMilestones,
     );
   }
 
@@ -38,6 +60,10 @@ class MarathonEnrollmentModel extends MarathonEnrollment {
       'enrolled_at': enrolledAt.toIso8601String(),
       'total_attendance': totalAttendance,
       'status': status.name,
+      'current_streak': currentStreak,
+      'longest_streak': longestStreak,
+      'last_attended_at': lastAttendedAt?.toIso8601String(),
+      'unlocked_milestones': unlockedMilestones.map((m) => m.name).toList(),
     };
   }
 
@@ -51,6 +77,10 @@ class MarathonEnrollmentModel extends MarathonEnrollment {
       enrolledAt: entity.enrolledAt,
       totalAttendance: entity.totalAttendance,
       status: entity.status,
+      currentStreak: entity.currentStreak,
+      longestStreak: entity.longestStreak,
+      lastAttendedAt: entity.lastAttendedAt,
+      unlockedMilestones: entity.unlockedMilestones,
     );
   }
 }

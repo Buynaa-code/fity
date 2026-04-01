@@ -174,9 +174,13 @@ class _CoachDashboardScreenState extends State<CoachDashboardScreen> {
       0,
       (sum, c) => sum + c.currentParticipants,
     );
-    final activeClasses = state.coachClasses
-        .where((c) => c.status == MarathonClassStatus.active)
-        .length;
+    final totalCapacity = state.coachClasses.fold<int>(
+      0,
+      (sum, c) => sum + c.maxParticipants,
+    );
+    final fillRate = totalCapacity > 0
+        ? (totalParticipants / totalCapacity * 100).round()
+        : 0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -202,10 +206,14 @@ class _CoachDashboardScreenState extends State<CoachDashboardScreen> {
           const SizedBox(width: 12),
           Expanded(
             child: _buildStatCard(
-              icon: Icons.play_circle_rounded,
-              label: 'Идэвхтэй',
-              value: activeClasses.toString(),
-              color: BrandColors.success,
+              icon: Icons.trending_up_rounded,
+              label: 'Дүүргэлт',
+              value: '$fillRate%',
+              color: fillRate >= 70
+                  ? BrandColors.success
+                  : fillRate >= 40
+                      ? BrandColors.warning
+                      : BrandColors.error,
             ),
           ),
         ],
@@ -288,6 +296,15 @@ class _CoachDashboardScreenState extends State<CoachDashboardScreen> {
   }
 
   Widget _buildClassCard(MarathonClass marathonClass) {
+    final fillRate = marathonClass.maxParticipants > 0
+        ? (marathonClass.currentParticipants / marathonClass.maxParticipants * 100)
+        : 0.0;
+    final fillColor = fillRate >= 80
+        ? BrandColors.success
+        : fillRate >= 50
+            ? BrandColors.warning
+            : BrandColors.textSecondary;
+
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -371,22 +388,58 @@ class _CoachDashboardScreenState extends State<CoachDashboardScreen> {
             ),
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Row(
+              child: Column(
                 children: [
-                  _buildClassInfoChip(
-                    icon: Icons.calendar_today_rounded,
-                    label: marathonClass.weekdaysDisplay,
+                  Row(
+                    children: [
+                      _buildClassInfoChip(
+                        icon: Icons.calendar_today_rounded,
+                        label: marathonClass.weekdaysDisplay,
+                      ),
+                      const SizedBox(width: 12),
+                      _buildClassInfoChip(
+                        icon: Icons.people_rounded,
+                        label: '${marathonClass.currentParticipants}/${marathonClass.maxParticipants}',
+                      ),
+                      const Spacer(),
+                      Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 16,
+                        color: BrandColors.textSecondary,
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 12),
-                  _buildClassInfoChip(
-                    icon: Icons.people_rounded,
-                    label: '${marathonClass.currentParticipants}/${marathonClass.maxParticipants}',
+                  const SizedBox(height: 12),
+                  // Дүүргэлтийн progress bar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: fillRate / 100,
+                      backgroundColor: BrandColors.surfaceVariant,
+                      valueColor: AlwaysStoppedAnimation<Color>(fillColor),
+                      minHeight: 6,
+                    ),
                   ),
-                  const Spacer(),
-                  Icon(
-                    Icons.arrow_forward_ios_rounded,
-                    size: 16,
-                    color: BrandColors.textSecondary,
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${fillRate.round()}% дүүрсэн',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: fillColor,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '${marathonClass.availableSpots} сул орон',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: BrandColors.textSecondary,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

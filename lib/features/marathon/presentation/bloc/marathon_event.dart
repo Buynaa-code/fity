@@ -154,3 +154,59 @@ class LoadClassDetail extends MarathonEvent {
   @override
   List<Object?> get props => [classId, currentUserId];
 }
+
+/// Гишүүний дэлгэрэнгүй мэдээллийг ачаалах
+class LoadMemberDetail extends MarathonEvent {
+  final String userId;
+  final String classId;
+
+  const LoadMemberDetail({
+    required this.userId,
+    required this.classId,
+  });
+
+  @override
+  List<Object?> get props => [userId, classId];
+}
+
+/// Гишүүний дэлгэрэнгүй мэдээллийг арилгах
+class ClearMemberDetail extends MarathonEvent {
+  const ClearMemberDetail();
+}
+
+/// Хэрэглэгчийн progress (streak, milestones) ачаалах
+class LoadUserProgress extends MarathonEvent {
+  final String userId;
+  final String classId;
+
+  const LoadUserProgress({
+    required this.userId,
+    required this.classId,
+  });
+
+  @override
+  List<Object?> get props => [userId, classId];
+}
+
+/// Хэрэглэгчийн ирцийн түүхийг ачаалах
+class LoadAttendanceHistory extends MarathonEvent {
+  final String userId;
+  final String classId;
+  final int limit;
+  final int offset;
+
+  const LoadAttendanceHistory({
+    required this.userId,
+    required this.classId,
+    this.limit = 30,
+    this.offset = 0,
+  });
+
+  @override
+  List<Object?> get props => [userId, classId, limit, offset];
+}
+
+/// Milestone celebration-ийг арилгах
+class ClearMilestoneCelebration extends MarathonEvent {
+  const ClearMilestoneCelebration();
+}

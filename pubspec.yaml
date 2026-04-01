@@ -65,6 +65,9 @@ dependencies:
 
   # Health data (HealthKit/Google Fit)
   health: ^11.1.0
+
+  # Image picker
+  image_picker: ^1.0.7
  
 
 dev_dependencies:
@@ -108,6 +111,7 @@ flutter:
     - assets/splash/
     - assets/onboarding/
     - assets/login/
+    - assets/images/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

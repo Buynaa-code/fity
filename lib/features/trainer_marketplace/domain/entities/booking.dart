@@ -14,6 +14,8 @@ class Booking extends Equatable {
   final BookingStatus status;
   final String? notes;
   final DateTime createdAt;
+  final bool hasReview;
+  final String? reviewId;
 
   const Booking({
     required this.id,
@@ -27,7 +29,11 @@ class Booking extends Equatable {
     required this.status,
     this.notes,
     required this.createdAt,
+    this.hasReview = false,
+    this.reviewId,
   });
+
+  bool get canLeaveReview => status == BookingStatus.completed && !hasReview;
 
   Booking copyWith({
     String? id,
@@ -41,6 +47,8 @@ class Booking extends Equatable {
     BookingStatus? status,
     String? notes,
     DateTime? createdAt,
+    bool? hasReview,
+    String? reviewId,
   }) {
     return Booking(
       id: id ?? this.id,
@@ -54,6 +62,8 @@ class Booking extends Equatable {
       status: status ?? this.status,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
+      hasReview: hasReview ?? this.hasReview,
+      reviewId: reviewId ?? this.reviewId,
     );
   }
 
@@ -70,5 +80,7 @@ class Booking extends Equatable {
         status,
         notes,
         createdAt,
+        hasReview,
+        reviewId,
       ];
 }

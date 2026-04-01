@@ -105,11 +105,11 @@ class TrainerDetailBloc extends Bloc<TrainerDetailEvent, TrainerDetailState> {
     on<SelectDate>(_onSelectDate);
   }
 
-  void _onLoadTrainerDetail(
-      LoadTrainerDetail event, Emitter<TrainerDetailState> emit) {
+  Future<void> _onLoadTrainerDetail(
+      LoadTrainerDetail event, Emitter<TrainerDetailState> emit) async {
     emit(TrainerDetailLoading());
     try {
-      final trainer = repository.getTrainerById(event.trainerId);
+      final trainer = await repository.getTrainerByIdAsync(event.trainerId);
       if (trainer == null) {
         emit(const TrainerDetailError('Дасгалжуулагч олдсонгүй'));
         return;

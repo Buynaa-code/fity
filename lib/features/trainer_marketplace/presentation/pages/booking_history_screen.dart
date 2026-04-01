@@ -4,6 +4,7 @@ import '../../../../core/branding/brand_config.dart';
 import '../../domain/entities/booking.dart';
 import '../../data/repositories/trainer_repository.dart';
 import '../bloc/booking/booking_bloc.dart';
+import 'create_review_screen.dart';
 
 class BookingHistoryScreen extends StatelessWidget {
   const BookingHistoryScreen({super.key});
@@ -240,6 +241,7 @@ class _BookingHistoryViewState extends State<_BookingHistoryView>
           final bloc = context.read<BookingBloc>();
           final canCancel = isUpcoming && bloc.canCancelBooking(booking);
           final timeUntilDeadline = bloc.getTimeUntilCancellationDeadline(booking);
+          final canReview = booking.canLeaveReview;
 
           return _BookingCard(
             booking: booking,
@@ -247,10 +249,28 @@ class _BookingHistoryViewState extends State<_BookingHistoryView>
             canCancel: canCancel,
             timeUntilDeadline: timeUntilDeadline,
             onCancel: canCancel ? () => _showCancelDialog(context, booking) : null,
+            onReview: canReview ? () => _navigateToReview(context, booking) : null,
           );
         },
       ),
     );
+  }
+
+  void _navigateToReview(BuildContext context, Booking booking) async {
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CreateReviewScreen(
+          booking: booking,
+          userId: 'current_user',
+          userName: 'Буянаа',
+        ),
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      context.read<BookingBloc>().add(LoadBookings());
+    }
   }
 
   Widget _buildErrorState(BuildContext context) {
@@ -435,6 +455,7 @@ class _BookingCard extends StatelessWidget {
   final bool canCancel;
   final Duration? timeUntilDeadline;
   final VoidCallback? onCancel;
+  final VoidCallback? onReview;
 
   const _BookingCard({
     required this.booking,
@@ -442,6 +463,7 @@ class _BookingCard extends StatelessWidget {
     required this.canCancel,
     this.timeUntilDeadline,
     this.onCancel,
+    this.onReview,
   });
 
   @override
@@ -598,6 +620,27 @@ class _BookingCard extends StatelessWidget {
                 label: Text(
                   'Цуцлах',
                   style: TextStyle(color: BrandColors.error),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+          // Review button for completed bookings
+          if (onReview != null)
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: BrandColors.divider),
+                ),
+              ),
+              child: TextButton.icon(
+                onPressed: onReview,
+                icon: Icon(Icons.star_outline_rounded, size: 18, color: Colors.amber),
+                label: const Text(
+                  'Үнэлгээ өгөх',
+                  style: TextStyle(color: Colors.amber),
                 ),
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 12),

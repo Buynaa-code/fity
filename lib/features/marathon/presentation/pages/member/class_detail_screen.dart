@@ -8,6 +8,10 @@ import '../../../domain/entities/marathon_class.dart';
 import '../../bloc/marathon_bloc.dart';
 import '../../bloc/marathon_event.dart';
 import '../../bloc/marathon_state.dart';
+import '../../widgets/weekly_attendance_dots.dart';
+import '../../widgets/marathon_stats_card.dart';
+import '../../widgets/milestones_progress.dart';
+import '../../widgets/attendance_history_list.dart';
 
 class ClassDetailScreen extends StatefulWidget {
   final MarathonClass marathonClass;
@@ -29,15 +33,27 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
   }
 
   void _loadData() {
-    final userId = context.read<UserBloc>().state.userId;
+    final userId = context.read<UserBloc>().state.userId ?? 'dev_user';
     context.read<MarathonBloc>().add(LoadClassDetail(
       classId: widget.marathonClass.id,
       currentUserId: userId,
+    ));
+    // Load user progress
+    context.read<MarathonBloc>().add(LoadUserProgress(
+      userId: userId,
+      classId: widget.marathonClass.id,
+    ));
+    // Load attendance history
+    context.read<MarathonBloc>().add(LoadAttendanceHistory(
+      userId: userId,
+      classId: widget.marathonClass.id,
     ));
   }
 
   @override
   Widget build(BuildContext context) {
+    final userId = context.read<UserBloc>().state.userId ?? 'dev_user';
+
     return BlocConsumer<MarathonBloc, MarathonState>(
       listener: (context, state) {
         if (state.successMessage != null) {
@@ -47,7 +63,7 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
                 children: [
                   const Icon(Icons.check_circle_rounded, color: Colors.white),
                   const SizedBox(width: 12),
-                  Text(state.successMessage!),
+                  Expanded(child: Text(state.successMessage!)),
                 ],
               ),
               backgroundColor: BrandColors.success,
@@ -76,9 +92,26 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
             ),
           );
         }
+        // Show milestone celebration dialog
+        if (state.newlyUnlockedMilestones.isNotEmpty) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (_) => MilestoneCelebrationDialog(
+                milestones: state.newlyUnlockedMilestones,
+                onDismiss: () {
+                  Navigator.of(context).pop();
+                  context.read<MarathonBloc>().add(const ClearMilestoneCelebration());
+                },
+              ),
+            );
+          });
+        }
       },
       builder: (context, state) {
         final marathonClass = state.selectedClass ?? widget.marathonClass;
+        final isEnrolled = marathonClass.isUserEnrolled(userId);
 
         return Scaffold(
           backgroundColor: BrandColors.background,
@@ -93,11 +126,40 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
                     children: [
                       _buildInfoCards(marathonClass),
                       const SizedBox(height: 24),
+                      // Weekly attendance dots for enrolled users
+                      if (isEnrolled && state.userProgress != null)
+                        _buildWeeklySection(state.userProgress!),
+                      if (isEnrolled && state.userProgress != null)
+                        const SizedBox(height: 24),
+                      // Stats card for enrolled users
+                      if (isEnrolled && state.userProgress != null)
+                        MarathonStatsCard(progress: state.userProgress!),
+                      if (isEnrolled && state.userProgress != null)
+                        const SizedBox(height: 24),
                       _buildDescription(marathonClass),
                       const SizedBox(height: 24),
                       _buildCoachSection(marathonClass),
                       const SizedBox(height: 24),
+                      // Milestones for enrolled users
+                      if (isEnrolled && state.userProgress != null && state.userProgress!.milestones.isNotEmpty)
+                        MilestonesProgress(milestones: state.userProgress!.milestones),
+                      if (isEnrolled && state.userProgress != null && state.userProgress!.milestones.isNotEmpty)
+                        const SizedBox(height: 24),
                       _buildParticipantsSection(state),
+                      const SizedBox(height: 24),
+                      // Attendance history for enrolled users
+                      if (isEnrolled && state.attendanceHistory.isNotEmpty)
+                        AttendanceHistoryList(
+                          history: state.attendanceHistory,
+                          hasMore: state.attendanceHistory.length >= 30,
+                          onLoadMore: () {
+                            context.read<MarathonBloc>().add(LoadAttendanceHistory(
+                              userId: userId,
+                              classId: marathonClass.id,
+                              offset: state.attendanceHistory.length,
+                            ));
+                          },
+                        ),
                       const SizedBox(height: 100),
                     ],
                   ),
@@ -108,6 +170,113 @@ class _ClassDetailScreenState extends State<ClassDetailScreen> {
           bottomNavigationBar: _buildBottomBar(context, state, marathonClass),
         );
       },
+    );
+  }
+
+  Widget _buildWeeklySection(UserProgress progress) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: BrandShadows.small,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  gradient: BrandGradients.primary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.calendar_view_week_rounded,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              const Text(
+                '7 хоногийн ирц',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: BrandColors.textPrimary,
+                ),
+              ),
+              const Spacer(),
+              if (progress.currentStreak > 0)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    gradient: BrandGradients.streak,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.local_fire_department_rounded,
+                        size: 14,
+                        color: Colors.white,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${progress.currentStreak} хоног',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          WeeklyAttendanceDots(weeklyAttendance: progress.weeklyAttendance),
+          const SizedBox(height: 12),
+          // Legend
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildLegendItem('Ирсэн', BrandColors.success),
+              const SizedBox(width: 16),
+              _buildLegendItem('Алдсан', BrandColors.error),
+              const SizedBox(width: 16),
+              _buildLegendItem('Ирээдүй', BrandColors.disabled.withValues(alpha: 0.3)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLegendItem(String label, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            color: color,
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: BrandColors.textTertiary,
+          ),
+        ),
+      ],
     );
   }
 

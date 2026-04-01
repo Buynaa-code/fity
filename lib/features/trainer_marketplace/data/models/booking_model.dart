@@ -13,6 +13,8 @@ class BookingModel extends Booking {
     required super.status,
     super.notes,
     required super.createdAt,
+    super.hasReview,
+    super.reviewId,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
@@ -31,6 +33,8 @@ class BookingModel extends Booking {
       ),
       notes: json['notes'] as String?,
       createdAt: DateTime.parse(json['createdAt'] as String),
+      hasReview: json['hasReview'] as bool? ?? false,
+      reviewId: json['reviewId'] as String?,
     );
   }
 
@@ -47,6 +51,8 @@ class BookingModel extends Booking {
       'status': status.name,
       'notes': notes,
       'createdAt': createdAt.toIso8601String(),
+      'hasReview': hasReview,
+      'reviewId': reviewId,
     };
   }
 
@@ -63,6 +69,8 @@ class BookingModel extends Booking {
     BookingStatus? status,
     String? notes,
     DateTime? createdAt,
+    bool? hasReview,
+    String? reviewId,
   }) {
     return BookingModel(
       id: id ?? this.id,
@@ -76,6 +84,8 @@ class BookingModel extends Booking {
       status: status ?? this.status,
       notes: notes ?? this.notes,
       createdAt: createdAt ?? this.createdAt,
+      hasReview: hasReview ?? this.hasReview,
+      reviewId: reviewId ?? this.reviewId,
     );
   }
 }

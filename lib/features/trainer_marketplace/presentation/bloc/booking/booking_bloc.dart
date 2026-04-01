@@ -168,6 +168,9 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       LoadBookings event, Emitter<BookingState> emit) async {
     emit(BookingLoading());
     try {
+      // Seed test data for review testing
+      await repository.seedTestBookings();
+
       final bookings = await repository.getBookings();
       final now = DateTime.now();
 
@@ -325,7 +328,7 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
       await repository.cancelBooking(event.bookingId);
 
       // Get trainer info
-      final trainer = repository.getTrainerById(currentBooking.trainerId);
+      final trainer = await repository.getTrainerByIdAsync(currentBooking.trainerId);
       if (trainer == null) {
         emit(const BookingError('Дасгалжуулагч олдсонгүй'));
         return;

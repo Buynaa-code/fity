@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/branding/brand_config.dart';
 import '../../../../user/presentation/bloc/user_bloc.dart';
 import '../../../domain/entities/marathon_class.dart';
+import '../../../domain/entities/marathon_enrollment.dart';
 import '../../bloc/marathon_bloc.dart';
 import '../../bloc/marathon_event.dart';
 import '../../bloc/marathon_state.dart';
@@ -199,7 +200,17 @@ class _MarathonListScreenState extends State<MarathonListScreen>
             padding: const EdgeInsets.all(20),
             itemCount: state.myClasses.length,
             itemBuilder: (context, index) {
-              return _buildClassCard(state.myClasses[index], isMyClass: true);
+              final marathonClass = state.myClasses[index];
+              // Find enrollment for this class
+              final enrollment = state.enrollments.cast<MarathonEnrollment?>().firstWhere(
+                (e) => e?.classId == marathonClass.id,
+                orElse: () => null,
+              );
+              return _buildClassCard(
+                marathonClass,
+                isMyClass: true,
+                enrollment: enrollment,
+              );
             },
           ),
         );
@@ -207,7 +218,11 @@ class _MarathonListScreenState extends State<MarathonListScreen>
     );
   }
 
-  Widget _buildClassCard(MarathonClass marathonClass, {required bool isMyClass}) {
+  Widget _buildClassCard(
+    MarathonClass marathonClass, {
+    required bool isMyClass,
+    MarathonEnrollment? enrollment,
+  }) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -279,7 +294,42 @@ class _MarathonListScreenState extends State<MarathonListScreen>
                       ],
                     ),
                   ),
-                  if (isMyClass)
+                  // Streak badge for enrolled classes
+                  if (isMyClass && enrollment != null && enrollment.currentStreak > 0)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        gradient: BrandGradients.streak,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: BrandColors.primary.withValues(alpha: 0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.local_fire_department_rounded,
+                            size: 14,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${enrollment.currentStreak}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else if (isMyClass)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
@@ -329,6 +379,23 @@ class _MarathonListScreenState extends State<MarathonListScreen>
                             : BrandColors.error,
                       ),
                       const Spacer(),
+                      // Stats for my classes
+                      if (isMyClass && enrollment != null)
+                        Row(
+                          children: [
+                            _buildMiniStat(
+                              Icons.check_circle_rounded,
+                              '${enrollment.totalAttendance}',
+                              BrandColors.success,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildMiniStat(
+                              Icons.percent_rounded,
+                              '${enrollment.attendanceRate.toStringAsFixed(0)}%',
+                              BrandColors.secondary,
+                            ),
+                          ],
+                        ),
                       if (!isMyClass && marathonClass.hasAvailableSpots)
                         Container(
                           padding: const EdgeInsets.symmetric(
@@ -359,7 +426,7 @@ class _MarathonListScreenState extends State<MarathonListScreen>
                             ],
                           ),
                         ),
-                      if (!marathonClass.hasAvailableSpots)
+                      if (!isMyClass && !marathonClass.hasAvailableSpots)
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -385,6 +452,31 @@ class _MarathonListScreenState extends State<MarathonListScreen>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMiniStat(IconData icon, String value, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
